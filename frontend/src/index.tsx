@@ -11,8 +11,8 @@
   
 //   document.body.appendChild(component());
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 class Test extends React.Component {
   render() {
