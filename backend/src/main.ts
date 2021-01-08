@@ -1,17 +1,34 @@
-import express from "express";
-import mongo from 'mongodb'; 
+import express, { Request, Response } from "express";
+import { DatabaseController } from "./DatabaseController";
+
 const app = express();
 const PORT = 8000;
-app.get('/', (req,res) => res.send('Express + TypeScript Server'));
-app.use(express.static('public'))
+const db = DatabaseController.getInstance();
+db.initDb();
 
-const mongoClient = mongo.MongoClient
-const url = "mongodb://localhost:27017/mydb";
-mongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  console.log("Database created!");
-  db.close();
+app.get('/', (req: Request, res: Response) => res.redirect("/index.html"));
+app.get('/ingredient/:name', async (req: Request, res: Response) => {
+  await db.read(DatabaseController.INGREDIENTS_COL, {name:req.params.name});
+  res.send(200);
 });
+app.get('/ingredients', async (req: Request, res: Response) => {
+  const all = await db.readAll(DatabaseController.INGREDIENTS_COL);
+  res.json(all);
+});
+app.delete('/ingredient/:name', async (req: Request, res: Response) => {
+  await db.remove(DatabaseController.INGREDIENTS_COL, {name:req.params.name});
+  res.send(200);
+});
+app.post('/ingredient/:name', async (req: Request, res: Response) => {
+  await db.write(DatabaseController.INGREDIENTS_COL, {name:req.params.name});
+  res.send(200);
+});
+app.patch('/ingredient/:name', async (req: Request, res: Response) => {
+  await db.replace(DatabaseController.INGREDIENTS_COL, {name:req.params.name}, {name:req.params.name});
+  res.send(200);
+});
+
+app.use(express.static('public'));
 
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
