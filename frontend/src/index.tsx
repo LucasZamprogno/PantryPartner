@@ -11,24 +11,8 @@
   
 //   document.body.appendChild(component());
 import 'bootstrap/dist/css/bootstrap.min.css';
-import $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Ingredient} from '../../common/types'
+import IngredientListComp from './IngredientListComp';
 
-class IngredientCompList extends React.Component<{elems:Array<Ingredient>}> {
-  render() {
-    const entries = this.props.elems.map(x => <IngredientComp name={x.name} />);
-    return <div>{entries}</div>;
-  }
-}
-
-class IngredientComp extends React.Component<{name:string}> {
-  render() {
-    return <h1>{this.props.name}</h1>;
-  }
-}
-
-$.get("/ingredients").then((res: Array<Ingredient>) => {
-  ReactDOM.render(<IngredientCompList elems={res}/>, document.getElementById('root'));
-});
+ReactDOM.render(<IngredientListComp />, document.getElementById('root'));
