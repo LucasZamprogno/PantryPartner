@@ -3,11 +3,11 @@ import * as React from 'react';
 export interface IProps {
 }
 
-export interface IState {
-  elements: any[];
+export interface IState<Type> {
+  elements: Array<Type>;
 }
 
-export default class FilterableListComp extends React.Component<IProps, IState> {
+export default abstract class FilterableListComp<T> extends React.Component<IProps, IState<T>> {
     constructor(props: IProps) {
       super(props)
       this.state = {elements: []}

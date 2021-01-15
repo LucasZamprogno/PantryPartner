@@ -5,7 +5,7 @@ import FilterableListComp, {IProps, IState} from './FilterableListComp';
 import $ from 'jquery';
 import SimpleAddComp from './SimpleAddComp';
 
-export default class IngredientListComp extends FilterableListComp {
+export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
     constructor(props: IProps) {
       super(props);
@@ -16,12 +16,12 @@ export default class IngredientListComp extends FilterableListComp {
 
     onElemRemove = (id: string) => {
       // TODO
-      this.setState((state: IState, props: IProps) => {elements: state.elements.filter(x => x._id != id)});
+      this.setState((state: IState<Ingredient>, props: IProps) => {elements: state.elements.filter(x => x._id != id)});
     };
 
     onElemAdd = (newElem: any) => {
       const withNew = this.state.elements.concat(newElem) // TODO MAKE SURE THIS DATA IS CORRECT
-      this.setState((state: IState, props: IProps) => {elements: withNew});
+      this.setState((state: IState<Ingredient>, props: IProps) => {elements: withNew});
     };
 
     componentDidMount(){ // Leave to sub class once sample done
