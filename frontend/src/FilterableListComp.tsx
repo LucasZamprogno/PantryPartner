@@ -15,13 +15,20 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
     }
 
     onElemRemove = (id: string) => {
-      // TODO
-      this.setState((state: IState<T>, props: IProps) => {elements: state.elements.filter(x => x._id != id)});
+      this.setState((state: IState<T>, props: IProps) => {
+        console.log(state.elements);
+        const newElems = state.elements.filter(x => x._id != id);
+        console.log(newElems);
+        return {elements: newElems}
+      });
     };
 
     onElemAdd = (newElem: any) => {
-      const withNew = this.state.elements.concat(newElem) // TODO MAKE SURE THIS DATA IS CORRECT
-      this.setState((state: IState<T>, props: IProps) => {elements: withNew});
+      console.log(newElem)
+      this.setState((state: IState<T>, props: IProps) => {
+        const withNew = this.state.elements.concat(newElem);
+        return {elements: withNew};
+      });
     };
 
     abstract makeComponent(element: T): JSX.Element;

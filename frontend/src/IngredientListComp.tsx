@@ -9,9 +9,9 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
     constructor(props: IProps) {
       super(props);
-      this.state = {
-        elements: []
-      }; // Why do I have to do this manually when extended?
+      // this.state = {
+      //   elements: []
+      // }; // Why do I have to do this manually when extended?
     }
 
     componentDidMount(){ // Leave to sub class once sample done
