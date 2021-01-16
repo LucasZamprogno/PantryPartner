@@ -5,13 +5,17 @@ export interface IProps {
 }
 
 export interface IState<Type> {
-  elements: Array<Type>;
+  elements: Array<Type>,
+  filterText: string
 }
 
 export default abstract class FilterableListComp<T extends MongoEntry> extends React.Component<IProps, IState<T>> {
     constructor(props: IProps) {
       super(props)
-      this.state = {elements: []}
+      this.state = {
+        elements: [],
+        filterText: ""
+      }
     }
 
     onElemRemove = (id: string) => {
@@ -31,9 +35,22 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
       });
     };
 
+    onInputUpdate = (event: any) => {
+      this.setState({filterText: event.target.value});
+    }
+
+    filter(initial: Array<T>) {
+      return initial.filter(x => this.filterCondition(x));
+    }
+
     abstract makeComponent(element: T): JSX.Element;
+    abstract filterCondition(item: T): boolean;
 
     renderList() {
-      return <div>{this.state.elements.map(x => this.makeComponent(x))}</div>;
+      return (
+      <div>
+        <input type='text' onChange={this.onInputUpdate} />
+        {this.filter(this.state.elements).map(x => this.makeComponent(x))}
+      </div>);
     }
   }

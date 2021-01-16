@@ -9,9 +9,6 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
     constructor(props: IProps) {
       super(props);
-      // this.state = {
-      //   elements: []
-      // }; // Why do I have to do this manually when extended?
     }
 
     componentDidMount(){ // Leave to sub class once sample done
@@ -22,6 +19,10 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
     makeComponent(ingredient: Ingredient) {
       return <IngredientComp callback={this.onElemRemove} key={ingredient._id} data={ingredient} />
+    }
+
+    filterCondition(ingredient: Ingredient) {
+      return ingredient.name.toLowerCase().includes(this.state.filterText.toLowerCase());
     }
 
     render() {

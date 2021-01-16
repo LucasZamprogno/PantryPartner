@@ -17,7 +17,7 @@ export default class IngredientComp extends React.Component<IProps, IState> {
           url: '/ingredient/' + this.props.data._id,
           type: 'DELETE',
           success: (result) => {
-              this.props.callback(result._id); // TOOD probably use a returned id
+              this.props.callback(result._id);
           },
           error:(err) => {
               // TODO add proper error handling
