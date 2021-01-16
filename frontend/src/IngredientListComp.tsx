@@ -14,30 +14,20 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
       }; // Why do I have to do this manually when extended?
     }
 
-    onElemRemove = (id: string) => {
-      // TODO
-      this.setState((state: IState<Ingredient>, props: IProps) => {elements: state.elements.filter(x => x._id != id)});
-    };
-
-    onElemAdd = (newElem: any) => {
-      const withNew = this.state.elements.concat(newElem) // TODO MAKE SURE THIS DATA IS CORRECT
-      this.setState((state: IState<Ingredient>, props: IProps) => {elements: withNew});
-    };
-
     componentDidMount(){ // Leave to sub class once sample done
         $.get("/ingredients").then((res: Array<Ingredient>) => {
             this.setState({elements: res});
         });
     }
 
-    makeIngredient(ingredient: Ingredient) {
+    makeComponent(ingredient: Ingredient) {
       return <IngredientComp callback={this.onElemRemove} key={ingredient._id} data={ingredient} />
     }
 
     render() {
       return (
         <div>
-          {this.state.elements.map(x => this.makeIngredient(x))}
+          {this.renderList()}
           <SimpleAddComp callback={this.onElemAdd}/>
         </div>
       )

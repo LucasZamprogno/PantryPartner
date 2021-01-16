@@ -1,4 +1,7 @@
-export interface Ingredient {
-    _id: string,
+export interface MongoEntry {
+    _id: string
+}
+
+export interface Ingredient extends MongoEntry {
     name: string
 }
