@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import {Ingredient} from "../../common/types";
 import { DatabaseController } from "./DatabaseController";
+import {ObjectId} from 'mongodb';
 
 const app = express();
 const PORT = 8000;
@@ -11,10 +12,15 @@ async function getIngredientByName(name: string): Promise<Ingredient> {
   return await db.read(DatabaseController.INGREDIENTS_COL, {name:name});
 }
 
+async function getIngredientById(id: ObjectId): Promise<Ingredient> {
+  return await db.read(DatabaseController.INGREDIENTS_COL, {_id:id});
+}
+
 app.get('/', (req: Request, res: Response) => res.redirect("/index.html"));
 
-app.get('/ingredient/:name', async (req: Request, res: Response) => {
-  const doc: Ingredient = await getIngredientByName(req.params.name);
+app.get('/ingredient/:id', async (req: Request, res: Response) => {
+  const id: ObjectId = new ObjectId(req.params.id);
+  const doc: Ingredient = await getIngredientById(id);
   if (doc) {
     res.status(200);
     res.json(doc);
@@ -28,10 +34,11 @@ app.get('/ingredients', async (req: Request, res: Response) => {
   res.json(all);
 });
 
-app.delete('/ingredient/:name', async (req: Request, res: Response) => {
-  const doc: Ingredient = await getIngredientByName(req.params.name);
+app.delete('/ingredient/:id', async (req: Request, res: Response) => {
+  const id: ObjectId = new ObjectId(req.params.id);
+  const doc: Ingredient = await getIngredientById(id);
   if (doc) {
-    await db.remove(DatabaseController.INGREDIENTS_COL, {name:req.params.name});
+    await db.remove(DatabaseController.INGREDIENTS_COL, {_id:id});
     res.status(200);
     res.json(doc);
   } else {
@@ -51,10 +58,12 @@ app.put('/ingredient/:name', async (req: Request, res: Response) => {
   }
 });
 
-app.patch('/ingredient/:name', async (req: Request, res: Response) => {
-  let doc: Ingredient = await getIngredientByName(req.params.name);
+app.patch('/ingredient/:id/:newname', async (req: Request, res: Response) => {
+  const id: ObjectId = new ObjectId(req.params.id);
+  let doc: Ingredient = await getIngredientById(id);
   if (doc) {
-    await db.replace(DatabaseController.INGREDIENTS_COL, {name:req.params.name}, {name:req.params.name});
+    // This will need to change
+    await db.replace(DatabaseController.INGREDIENTS_COL, {_id:id}, {name:req.params.newname});
     res.status(200);
     res.json(doc);
   } else {

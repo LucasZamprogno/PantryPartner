@@ -14,7 +14,7 @@ export default class IngredientComp extends React.Component<IProps, IState> {
 
     onButtonClick = (event: any) => {
       $.ajax({
-          url: '/ingredient/' + this.props.data.name,
+          url: '/ingredient/' + this.props.data._id,
           type: 'DELETE',
           success: (result) => {
               this.props.callback(result._id); // TOOD probably use a returned id
