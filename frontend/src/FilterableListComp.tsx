@@ -30,7 +30,7 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
     onElemAdd = (newElem: any) => {
       console.log(newElem)
       this.setState((state: IState<T>, props: IProps) => {
-        const withNew = this.state.elements.concat(newElem);
+        const withNew = state.elements.concat(newElem);
         return {elements: withNew};
       });
     };
