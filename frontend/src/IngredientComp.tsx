@@ -33,11 +33,11 @@ export default class IngredientComp extends React.Component<IProps, IState> {
         <div className="card-body p-2">
           <h5 className="card-title">{this.props.data.name}</h5>
           <div className="form-check">
-            <input type="checkbox" checked={true} className="form-check-input" id={stapleId}/>
+            <input type="checkbox" defaultChecked={this.props.data.isStaple} className="form-check-input" id={stapleId}/>
             <label className="form-check-label" htmlFor={stapleId}>Staple ingredient</label>
           </div>
           <div className="form-check">
-            <input type="checkbox" className="form-check-input" id={stockedId}/>
+            <input type="checkbox" defaultChecked={this.props.data.isStocked} className="form-check-input" id={stockedId}/>
             <label className="form-check-label" htmlFor={stockedId}>Have stocked</label>
           </div>
           <button type="button" className="btn btn-outline-secondary p-1" onClick={this.onButtonClick}>Delete</button>

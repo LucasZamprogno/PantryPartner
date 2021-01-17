@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
-import {Ingredient} from "../../common/types";
+import bodyParser from "body-parser";
+import {Ingredient, IngredientPreWrite} from "../../common/types";
 import { DatabaseController } from "./DatabaseController";
 import {ObjectId} from 'mongodb';
 
 const app = express();
+app.use(bodyParser.json())
 const PORT = 8000;
 const db = DatabaseController.getInstance();
 db.initDb();
@@ -46,19 +48,21 @@ app.delete('/ingredient/:id', async (req: Request, res: Response) => {
   }
 });
 
-app.put('/ingredient/:name', async (req: Request, res: Response) => {
+app.put('/ingredient', async (req: Request, res: Response) => {
   let doc: Ingredient = await getIngredientByName(req.params.name);
   if (doc) {
     res.status(404);
   } else {
-    await db.write(DatabaseController.INGREDIENTS_COL, {name:req.params.name});
-    doc = await getIngredientByName(req.params.name);
+    const body: IngredientPreWrite = req.body;
+    await db.write(DatabaseController.INGREDIENTS_COL, body);
+    doc = await getIngredientByName(body.name);
     res.status(200);
     res.json(doc);
   }
 });
 
 app.patch('/ingredient/:id/:newname', async (req: Request, res: Response) => {
+  // TODO update to use body/more props
   const id: ObjectId = new ObjectId(req.params.id);
   let doc: Ingredient = await getIngredientById(id);
   if (doc) {
