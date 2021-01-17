@@ -38,9 +38,13 @@ export default class SimpleAddComp extends React.Component<IProps, IState> {
 
     render() {
       return (
-        <div>
-            <input type='text' onChange={this.onInputUpdate} />
-            <button onClick={this.onButtonClick}>Add</button>
+        <div className="col-12">
+            <div>
+                <input className="form-control" type="text" placeholder="Ingredient name" onChange={this.onInputUpdate} />
+            </div>
+            <div>
+                <button className="btn btn-primary" onClick={this.onButtonClick}>Add</button>
+            </div>
         </div>
       );
     }

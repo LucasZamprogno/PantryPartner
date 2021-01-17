@@ -15,4 +15,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import IngredientListComp from './IngredientListComp';
 
-ReactDOM.render(<IngredientListComp />, document.getElementById('root'));
+ReactDOM.render(
+    (<div className="row justify-content-center">
+        <div className="col-10"><IngredientListComp /></div>
+    </div>),
+    document.getElementById('root'));

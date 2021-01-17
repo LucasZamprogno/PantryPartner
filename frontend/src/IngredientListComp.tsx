@@ -29,7 +29,9 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
       return (
         <div>
           {this.renderList()}
-          <SimpleAddComp callback={this.onElemAdd}/>
+          <div className="row">
+            <SimpleAddComp callback={this.onElemAdd}/>
+          </div>
         </div>
       )
     }
