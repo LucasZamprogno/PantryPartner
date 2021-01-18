@@ -1,4 +1,6 @@
 import {Db, MongoClient} from "mongodb";
+import { MongoEntry } from "../../common/types";
+import {ObjectId} from 'mongodb';
 
 export class DatabaseController {
 
@@ -32,9 +34,14 @@ export class DatabaseController {
         return this.db!.collection(col).find().toArray();
     }
 
-
-    public async replace(col: string, query: any, doc: any) {
-        this.db!.collection(col).updateOne(query, doc);
+    public async replace(col: string, doc: MongoEntry) {
+        const id = new ObjectId(doc._id);
+        const toUpdate = JSON.parse(JSON.stringify(doc));
+        delete toUpdate._id;
+        const changeOp = {$set: toUpdate};
+        console.log(changeOp);
+        console.log(await this.db!.collection(col).findOne({"_id": id}));
+        this.db!.collection(col).updateOne({"_id": id}, changeOp);
     }
 
     public async set(col: string, query: any, prop: string, val: any) {
@@ -45,7 +52,4 @@ export class DatabaseController {
     public async remove(col: string, query: any) {
         this.db!.collection(col).deleteOne(query);
     }
-
-
-
 }

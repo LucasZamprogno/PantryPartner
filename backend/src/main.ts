@@ -49,11 +49,11 @@ app.delete('/ingredient/:id', async (req: Request, res: Response) => {
 });
 
 app.put('/ingredient', async (req: Request, res: Response) => {
-  let doc: Ingredient = await getIngredientByName(req.params.name);
+  const body: IngredientPreWrite = req.body;
+  let doc: Ingredient = await getIngredientByName(body.name);
   if (doc) {
-    res.status(404);
+    res.status(400);
   } else {
-    const body: IngredientPreWrite = req.body;
     await db.write(DatabaseController.INGREDIENTS_COL, body);
     doc = await getIngredientByName(body.name);
     res.status(200);
@@ -61,17 +61,17 @@ app.put('/ingredient', async (req: Request, res: Response) => {
   }
 });
 
-app.patch('/ingredient/:id/:newname', async (req: Request, res: Response) => {
-  // TODO update to use body/more props
-  const id: ObjectId = new ObjectId(req.params.id);
+app.patch('/ingredient', async (req: Request, res: Response) => {
+  const body: Ingredient = req.body;
+  const id: ObjectId = new ObjectId(body._id);
   let doc: Ingredient = await getIngredientById(id);
   if (doc) {
     // This will need to change
-    await db.replace(DatabaseController.INGREDIENTS_COL, {_id:id}, {name:req.params.newname});
+    await db.replace(DatabaseController.INGREDIENTS_COL, body);
     res.status(200);
     res.json(doc);
   } else {
-    res.sendStatus(404);
+    res.sendStatus(400);
   }
 });
 
