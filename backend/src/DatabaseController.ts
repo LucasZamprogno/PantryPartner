@@ -1,7 +1,6 @@
 import {Db, MongoClient} from "mongodb";
 import { MongoEntry } from "../../common/types";
 import {ObjectId} from 'mongodb';
-import {Ingredient} from "../../common/types";
 
 export class DatabaseController {
 
@@ -13,11 +12,11 @@ export class DatabaseController {
     private db: Db | null = null;
 
     public async getByName(col: string, name: string) {
-      return await this.read(DatabaseController.INGREDIENTS_COL, {name:name});
+      return await this.read(col, {name:name});
     }
     
     public async getById(col: string, id: string) {
-      return await this.read(DatabaseController.INGREDIENTS_COL, {_id: new ObjectId(id)});
+      return await this.read(col, {_id: new ObjectId(id)});
     }
     
     public static getInstance() {
@@ -49,8 +48,6 @@ export class DatabaseController {
         const toUpdate = JSON.parse(JSON.stringify(doc));
         delete toUpdate._id;
         const changeOp = {$set: toUpdate};
-        console.log(changeOp);
-        console.log(await this.db!.collection(col).findOne({"_id": id}));
         this.db!.collection(col).updateOne({"_id": id}, changeOp);
     }
 

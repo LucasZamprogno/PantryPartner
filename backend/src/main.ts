@@ -54,12 +54,11 @@ app.put('/ingredient', async (req: Request, res: Response) => {
 
 app.patch('/ingredient', async (req: Request, res: Response) => {
   const body: Ingredient = req.body;
-  let doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
+  let doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.body._id);
   if (doc) {
-    // This will need to change
     await db.replace(DatabaseController.INGREDIENTS_COL, body);
     res.status(200);
-    res.json(doc);
+    res.json(body); // Change if this ever is no longer valid
   } else {
     res.sendStatus(400);
   }
@@ -77,7 +76,6 @@ app.get('/recipe/:id', async (req: Request, res: Response) => {
 
 app.get('/recipes', async (req: Request, res: Response) => {
   const all = await db.readRecipesInFull();
-  //const all = await db.readAll(DatabaseController.RECIPE_COL);
     console.log(all);
   res.json(all);
 });
@@ -110,13 +108,12 @@ app.put('/recipe', async (req: Request, res: Response) => {
 });
 
 app.patch('/recipe', async (req: Request, res: Response) => {
-  const body: Ingredient = req.body;
-  let doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  const body: Recipe = req.body;
+  let doc: Recipe = await db.getById(DatabaseController.RECIPE_COL, req.body._id);
   if (doc) {
-    // This will need to change
     await db.replace(DatabaseController.RECIPE_COL, body);
     res.status(200);
-    res.json(doc);
+    res.json(req.body); // Change if this ever is no longer valid
   } else {
     res.sendStatus(400);
   }
