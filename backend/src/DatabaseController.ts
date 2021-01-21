@@ -1,14 +1,24 @@
 import {Db, MongoClient} from "mongodb";
 import { MongoEntry } from "../../common/types";
 import {ObjectId} from 'mongodb';
+import {Ingredient} from "../../common/types";
 
 export class DatabaseController {
 
     private static instance: DatabaseController = new DatabaseController(); // WARN: Called at import time
     private readonly url = "mongodb://localhost:27017/mydb";
     public static readonly INGREDIENTS_COL = 'ingredients';
+    public static readonly RECIPE_COL = 'recipes';
 
     private db: Db | null = null;
+
+    public async getByName(col: string, name: string) {
+      return await this.read(DatabaseController.INGREDIENTS_COL, {name:name});
+    }
+    
+    public async getById(col: string, id: string) {
+      return await this.read(DatabaseController.INGREDIENTS_COL, {_id: new ObjectId(id)});
+    }
     
     public static getInstance() {
         return DatabaseController.instance;
@@ -51,5 +61,19 @@ export class DatabaseController {
 
     public async remove(col: string, query: any) {
         this.db!.collection(col).deleteOne(query);
+    }
+
+    public async readRecipesInFull() {
+        return this.db?.collection(DatabaseController.RECIPE_COL).aggregate([
+           {
+             $lookup:
+               {
+                 from: DatabaseController.INGREDIENTS_COL,
+                 localField: "ingredients",
+                 foreignField: "_id",
+                 as: "ingredient_names"
+               }
+          }
+        ]).toArray();
     }
 }

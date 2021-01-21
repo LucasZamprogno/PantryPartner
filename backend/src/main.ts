@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
-import {Ingredient, IngredientPreWrite} from "../../common/types";
+import {Ingredient, IngredientPreWrite, Recipe, RecipePreWrite} from "../../common/types";
 import { DatabaseController } from "./DatabaseController";
 import {ObjectId} from 'mongodb';
 
@@ -10,19 +10,10 @@ const PORT = 8000;
 const db = DatabaseController.getInstance();
 db.initDb();
 
-async function getIngredientByName(name: string): Promise<Ingredient> {
-  return await db.read(DatabaseController.INGREDIENTS_COL, {name:name});
-}
-
-async function getIngredientById(id: ObjectId): Promise<Ingredient> {
-  return await db.read(DatabaseController.INGREDIENTS_COL, {_id:id});
-}
-
 app.get('/', (req: Request, res: Response) => res.redirect("/index.html"));
 
 app.get('/ingredient/:id', async (req: Request, res: Response) => {
-  const id: ObjectId = new ObjectId(req.params.id);
-  const doc: Ingredient = await getIngredientById(id);
+  const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
   if (doc) {
     res.status(200);
     res.json(doc);
@@ -38,7 +29,7 @@ app.get('/ingredients', async (req: Request, res: Response) => {
 
 app.delete('/ingredient/:id', async (req: Request, res: Response) => {
   const id: ObjectId = new ObjectId(req.params.id);
-  const doc: Ingredient = await getIngredientById(id);
+  const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
   if (doc) {
     await db.remove(DatabaseController.INGREDIENTS_COL, {_id:id});
     res.status(200);
@@ -50,12 +41,12 @@ app.delete('/ingredient/:id', async (req: Request, res: Response) => {
 
 app.put('/ingredient', async (req: Request, res: Response) => {
   const body: IngredientPreWrite = req.body;
-  let doc: Ingredient = await getIngredientByName(body.name);
+  let doc: Ingredient = await db.getByName(DatabaseController.INGREDIENTS_COL, body.name);
   if (doc) {
     res.status(400);
   } else {
     await db.write(DatabaseController.INGREDIENTS_COL, body);
-    doc = await getIngredientByName(body.name);
+    doc = await db.getByName(DatabaseController.INGREDIENTS_COL, body.name);
     res.status(200);
     res.json(doc);
   }
@@ -63,8 +54,7 @@ app.put('/ingredient', async (req: Request, res: Response) => {
 
 app.patch('/ingredient', async (req: Request, res: Response) => {
   const body: Ingredient = req.body;
-  const id: ObjectId = new ObjectId(body._id);
-  let doc: Ingredient = await getIngredientById(id);
+  let doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
   if (doc) {
     // This will need to change
     await db.replace(DatabaseController.INGREDIENTS_COL, body);
@@ -75,6 +65,62 @@ app.patch('/ingredient', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/recipe/:id', async (req: Request, res: Response) => {
+  const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  if (doc) {
+    res.status(200);
+    res.json(doc);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+app.get('/recipes', async (req: Request, res: Response) => {
+  const all = await db.readRecipesInFull();
+  //const all = await db.readAll(DatabaseController.RECIPE_COL);
+    console.log(all);
+  res.json(all);
+});
+
+app.delete('/recipe/:id', async (req: Request, res: Response) => {
+  const id: ObjectId = new ObjectId(req.params.id);
+  const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  if (doc) {
+    await db.remove(DatabaseController.RECIPE_COL, {_id:id});
+    res.status(200);
+    res.json(doc);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+app.put('/recipe', async (req: Request, res: Response) => {
+  const body: RecipePreWrite = req.body;
+  let doc: Recipe = await db.getByName(DatabaseController.RECIPE_COL, body.name);
+  if (doc) {
+    res.status(400);
+  } else {
+    const newBody = JSON.parse(JSON.stringify(body));
+    newBody.ingredients = body.ingredients.map(x => new ObjectId(x));
+    await db.write(DatabaseController.RECIPE_COL, newBody);
+    doc = await db.getByName(DatabaseController.RECIPE_COL, body.name);
+    res.status(200);
+    res.json(doc);
+  }
+});
+
+app.patch('/recipe', async (req: Request, res: Response) => {
+  const body: Ingredient = req.body;
+  let doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  if (doc) {
+    // This will need to change
+    await db.replace(DatabaseController.RECIPE_COL, body);
+    res.status(200);
+    res.json(doc);
+  } else {
+    res.sendStatus(400);
+  }
+});
 app.use(express.static('public'));
 
 app.listen(PORT, () => {

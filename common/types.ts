@@ -9,3 +9,10 @@ export interface IngredientPreWrite {
 }
 
 export interface Ingredient extends MongoEntry, IngredientPreWrite {}
+
+export interface RecipePreWrite {
+    name: string,
+    ingredients: string[]
+}
+
+export interface Recipe extends MongoEntry, IngredientPreWrite {}
