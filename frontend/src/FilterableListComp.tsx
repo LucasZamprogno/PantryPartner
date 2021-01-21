@@ -62,7 +62,9 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
             <input className="form-control" type="text" placeholder="Filter" onChange={this.onInputUpdate} />
           </div>
         </div>
-        {this.filter(this.state.elements).map(x => this.makeListRow(x))}
+        <div className="my-2">
+          {this.filter(this.state.elements).map(x => this.makeListRow(x))}
+        </div>
       </div>);
     }
   }
