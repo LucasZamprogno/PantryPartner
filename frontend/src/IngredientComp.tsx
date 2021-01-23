@@ -21,7 +21,7 @@ export default class IngredientComp extends React.Component<IProps, IState> {
       this.state = ingCopy;
     }
 
-    getIngredientFromState() {
+    getIngredientFromProps() {
       const stateCopy = JSON.parse(JSON.stringify(this.props.data));
       delete stateCopy.expanded;
       return stateCopy;
@@ -59,7 +59,7 @@ export default class IngredientComp extends React.Component<IProps, IState> {
           dataType: 'json',
           url: '/ingredient',
           type: 'PATCH',
-          data: JSON.stringify(this.getIngredientFromState()),
+          data: JSON.stringify(this.getIngredientFromProps()),
           success: (result: Ingredient) => {
             this.setState(result);
           },

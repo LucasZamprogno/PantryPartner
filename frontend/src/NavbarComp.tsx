@@ -1,6 +1,12 @@
 import * as React from 'react';
+import $ from 'jquery';
 
 export default class NavbarComp extends React.Component {
+
+    toggleVisible = (targetId: string) => {
+      $("div.active").toggleClass("active d-none");
+      $(`div#${targetId}`).toggleClass("active d-none");
+    }
 
     render() {
       return (
@@ -12,10 +18,10 @@ export default class NavbarComp extends React.Component {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item active">
-              <a className="nav-link" href="#">Ingredients <span className="sr-only">(current)</span></a>
+              <a className="nav-link" onClick={() => this.toggleVisible("ingredients")}>Ingredients <span className="sr-only">(current)</span></a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Recipes</a>
+              <a className="nav-link" onClick={() => this.toggleVisible("recipes")}>Recipes</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">Shopping List</a>

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import IngredientComp from './IngredientComp';
 import {Ingredient} from '../../common/types'
-import FilterableListComp, {IProps, IState} from './FilterableListComp';
+import FilterableListComp, {IProps} from './FilterableListComp';
 import $ from 'jquery';
-import SimpleAddComp from './SimpleAddComp';
+import IngredientAddComp from './IngredientAddComp';
 
 export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
@@ -30,7 +30,7 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
         <div>
           {this.renderList()}
           <div className="row">
-            <SimpleAddComp callback={this.onElemAdd}/>
+            <IngredientAddComp callback={this.onElemAdd}/>
           </div>
         </div>
       )
