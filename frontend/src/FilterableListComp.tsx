@@ -1,39 +1,24 @@
 import * as React from 'react';
-import { MongoEntry } from '../../common/types';
+import { MongoEntry} from '../../common/types';
+import { ComHub } from './App';
 
-export interface IProps {
+export interface IProps<T> {
+  comHub: ComHub,
+  elements: T[],
+  altElements?: any[] // TODO maybe make a proper type system here
 }
 
-export interface IState<Type> {
-  elements: Array<Type>,
+export interface IState {
   filterText: string
 }
 
-export default abstract class FilterableListComp<T extends MongoEntry> extends React.Component<IProps, IState<T>> {
-    constructor(props: IProps) {
+export default abstract class FilterableListComp<T extends MongoEntry> extends React.Component<IProps<T>, IState> {
+    constructor(props: IProps<T>) {
       super(props)
       this.state = {
-        elements: [],
         filterText: ""
       }
     }
-
-    onElemRemove = (id: string) => {
-      this.setState((state: IState<T>, props: IProps) => {
-        console.log(state.elements);
-        const newElems = state.elements.filter(x => x._id != id);
-        console.log(newElems);
-        return {elements: newElems}
-      });
-    };
-
-    onElemAdd = (newElem: any) => {
-      console.log(newElem)
-      this.setState((state: IState<T>, props: IProps) => {
-        const withNew = state.elements.concat(newElem);
-        return {elements: withNew};
-      });
-    };
 
     onInputUpdate = (event: any) => {
       this.setState({filterText: event.target.value});
@@ -63,7 +48,7 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
           </div>
         </div>
         <div className="my-2">
-          {this.filter(this.state.elements).map(x => this.makeListRow(x))}
+          {this.filter(this.props.elements).map(x => this.makeListRow(x))}
         </div>
       </div>);
     }

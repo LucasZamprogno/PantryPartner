@@ -2,23 +2,16 @@ import * as React from 'react';
 import IngredientComp from './IngredientComp';
 import {Ingredient} from '../../common/types'
 import FilterableListComp, {IProps} from './FilterableListComp';
-import $ from 'jquery';
 import IngredientAddComp from './IngredientAddComp';
 
 export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
-    constructor(props: IProps) {
+    constructor(props: IProps<Ingredient>) {
       super(props);
     }
 
-    componentDidMount(){ // Leave to sub class once sample done
-        $.get("/ingredients").then((res: Array<Ingredient>) => {
-            this.setState({elements: res});
-        });
-    }
-
     makeComponent(ingredient: Ingredient) {
-      return <IngredientComp callback={this.onElemRemove} key={ingredient._id} data={ingredient} />
+      return <IngredientComp callback={this.props.comHub['ingredient-remove']} key={ingredient._id} data={ingredient} />
     }
 
     filterCondition(ingredient: Ingredient) {
@@ -30,7 +23,7 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
         <div>
           {this.renderList()}
           <div className="row">
-            <IngredientAddComp callback={this.onElemAdd}/>
+            <IngredientAddComp callback={this.props.comHub['ingredient-add']}/>
           </div>
         </div>
       )
