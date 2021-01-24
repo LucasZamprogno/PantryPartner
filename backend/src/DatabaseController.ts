@@ -2,7 +2,7 @@ import {Db, MongoClient} from "mongodb";
 import { MongoEntry, Recipe } from "../../common/types";
 import {ObjectId} from 'mongodb';
 
-export class DatabaseController {
+export abstract class DatabaseController {
 
     private static instance: DatabaseController;
     private readonly url = "mongodb://localhost:27017/mydb";
@@ -10,15 +10,8 @@ export class DatabaseController {
     public static readonly RECIPE_COL = 'recipes';
 
     private db: Db | null = null;
-    
-    public static getInstance() {
-        if (!DatabaseController.instance) {
-            DatabaseController.instance = new DatabaseController();
-        }
-        return DatabaseController.instance;
-    }
 
-    private constructor() {
+    protected constructor() {
         console.log("DatabaseController init");
     }
 
