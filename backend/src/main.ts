@@ -76,7 +76,6 @@ app.get('/recipe/:id', async (req: Request, res: Response) => {
 
 app.get('/recipes', async (req: Request, res: Response) => {
   const all = await db.readRecipesInFull();
-    console.log(all);
   res.json(all);
 });
 

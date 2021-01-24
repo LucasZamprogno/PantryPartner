@@ -7,7 +7,12 @@ interface IProps {
     options: Ingredient[]
 }
 
-export default class IngredientAddComp extends React.Component<IProps, RecipePreWrite> {
+interface IState {
+    name: string,
+    ingredients: Ingredient[],
+}
+
+export default class IngredientAddComp extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
@@ -21,11 +26,11 @@ export default class IngredientAddComp extends React.Component<IProps, RecipePre
     }
 
     onIngredientAdd = (event: any) => {
-        this.setState((state: RecipePreWrite, props: IProps) => {
+        this.setState((state: IState, props: IProps) => {
             const selectedName = $("#ingredientSelector").val();
             for (const elem of this.props.options) {
                 if (elem.name === selectedName) {
-                    const withNew = state.ingredients.concat(elem._id);
+                    const withNew = state.ingredients.concat(elem);
                     return {ingredients: withNew};
                 }
             }
@@ -36,6 +41,7 @@ export default class IngredientAddComp extends React.Component<IProps, RecipePre
 
     getRecipeFromState() {
         const stateCopy = JSON.parse(JSON.stringify(this.state));
+        stateCopy.ingredients = stateCopy.ingredients.map((x: Ingredient) => x._id);
         delete stateCopy.expanded;
         return stateCopy;
     }
@@ -46,7 +52,7 @@ export default class IngredientAddComp extends React.Component<IProps, RecipePre
             dataType: 'json',
             url: '/recipe/',
             type: 'PUT',
-            data: JSON.stringify(this.state),
+            data: JSON.stringify(this.getRecipeFromState()),
             success: (result) => {
                 this.props.callback(result);
             },
@@ -77,7 +83,7 @@ export default class IngredientAddComp extends React.Component<IProps, RecipePre
                     </div>
                     <p>Ingredients:</p>
                     <ul>
-                        {this.state.ingredients.map(x => (<li>{x}</li>))}
+                        {this.state.ingredients.map(x => (<li>{x.name}</li>))}
                     </ul>
                     <div className="input-group mb-3">
                         <div className="input-group-append">
