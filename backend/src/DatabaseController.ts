@@ -4,7 +4,7 @@ import {ObjectId} from 'mongodb';
 
 export class DatabaseController {
 
-    private static instance: DatabaseController = new DatabaseController(); // WARN: Called at import time
+    private static instance: DatabaseController;
     private readonly url = "mongodb://localhost:27017/mydb";
     public static readonly INGREDIENTS_COL = 'ingredients';
     public static readonly RECIPE_COL = 'recipes';
@@ -28,6 +28,9 @@ export class DatabaseController {
     }
     
     public static getInstance() {
+        if (!DatabaseController.instance) {
+            DatabaseController.instance = new DatabaseController();
+        }
         return DatabaseController.instance;
     }
 
