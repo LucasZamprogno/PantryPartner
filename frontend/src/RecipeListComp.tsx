@@ -10,11 +10,11 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
       super(props);
     }
 
-    makeComponent(recipe: Recipe) {
+    makeComponent(recipe: Recipe): JSX.Element {
       return <RecipeComp callback={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe} />
     }
 
-    filterCondition(recipe: Recipe) {
+    filterCondition(recipe: Recipe): boolean {
       return recipe.name.toLowerCase().includes(this.state.filterText.toLowerCase());
     }
 

@@ -20,15 +20,15 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
       }
     }
 
-    onInputUpdate = (event: any) => {
+    onInputUpdate = (event: any): void => {
       this.setState({filterText: event.target.value});
     }
 
-    filter(initial: Array<T>) {
+    filter(initial: Array<T>): Array<T> {
       return initial.filter(x => this.filterCondition(x));
     }
 
-    makeListRow(elem: T) {
+    makeListRow(elem: T): JSX.Element {
       return (
       <div className="row">
         <div className="col-12">{this.makeComponent(elem)}</div>
@@ -39,7 +39,7 @@ export default abstract class FilterableListComp<T extends MongoEntry> extends R
     abstract makeComponent(element: T): JSX.Element;
     abstract filterCondition(item: T): boolean;
 
-    renderList() {
+    renderList(): JSX.Element {
       return (
       <div>
         <div className="row justify-content-start">

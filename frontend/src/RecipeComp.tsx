@@ -21,17 +21,13 @@ export default class RecipeComp extends React.Component<IProps, IState> {
       this.state = ingCopy;
     }
 
-    getRecipeFromState() {
+    getRecipeFromState(): Recipe {
       const stateCopy = JSON.parse(JSON.stringify(this.props.data));
       delete stateCopy.expanded;
       return stateCopy;
     }
 
-    onCardClick = (event: any) => {
-      $("div.card-body div.collapse")
-  }
-
-    onDeleteClick = (event: any) => {
+    onDeleteClick = (event: any): void => {
       $.ajax({
           url: '/recipe/' + this.props.data._id,
           type: 'DELETE',
@@ -45,7 +41,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
       });
     }
     
-    onUpdateClick = (event: any) => {
+    onUpdateClick = (event: any): void => {
       $.ajax({
           contentType: 'application/json',
           dataType: 'json',

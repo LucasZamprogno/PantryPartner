@@ -21,11 +21,11 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
             ingredients: [],
         }
     }
-    onNameUpdate = (event: any) => {
+    onNameUpdate = (event: any): void => {
         this.setState({name: event.target.value});
     }
 
-    onIngredientAdd = (event: any) => {
+    onIngredientAdd = (event: any): void => {
         this.setState((state: IState, props: IProps) => {
             const selectedName = $("#ingredientSelector").val();
             for (const elem of this.props.options) {
@@ -48,7 +48,7 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
         };
     }
 
-    onButtonClick = (event: any) => {
+    onButtonClick = (event: any): void => {
         $.ajax({
             contentType: 'application/json',
             dataType: 'json',
@@ -65,7 +65,7 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
         });
     }
 
-    makeOptionList() {
+    makeOptionList(): JSX.Element {
         const options = this.props.options.map(x => (<option value={x.name}/>))
         return (
             <datalist id="suggestions">

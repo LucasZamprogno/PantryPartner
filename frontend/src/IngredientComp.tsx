@@ -21,25 +21,21 @@ export default class IngredientComp extends React.Component<IProps, IState> {
       this.state = ingCopy;
     }
 
-    getIngredientFromState() {
+    getIngredientFromState(): Ingredient {
       const stateCopy = JSON.parse(JSON.stringify(this.state));
       delete stateCopy.expanded;
       return stateCopy;
     }
 
-    onStapleUpdate = (event: any) => {
+    onStapleUpdate = (event: any): void => {
         this.setState({isStaple: event.target.checked});
     }
 
-    onStockedUpdate = (event: any) => {
+    onStockedUpdate = (event: any): void => {
         this.setState({isStocked: event.target.checked});
     }
 
-    onCardClick = (event: any) => {
-      $("div.card-body div.collapse")
-  }
-
-    onDeleteClick = (event: any) => {
+    onDeleteClick = (event: any): void => {
       $.ajax({
           url: '/ingredient/' + this.props.data._id,
           type: 'DELETE',
@@ -53,7 +49,7 @@ export default class IngredientComp extends React.Component<IProps, IState> {
       });
     }
     
-    onUpdateClick = (event: any) => {
+    onUpdateClick = (event: any): void => {
       $.ajax({
           contentType: 'application/json',
           dataType: 'json',

@@ -17,19 +17,19 @@ export default class IngredientAddComp extends React.Component<IProps, Ingredien
         }
     }
 
-    onNameUpdate = (event: any) => {
+    onNameUpdate = (event: any): void => {
         this.setState({name: event.target.value});
     }
 
-    onStapleUpdate = (event: any) => {
+    onStapleUpdate = (event: any): void => {
         this.setState({isStaple: event.target.checked});
     }
 
-    onStockedUpdate = (event: any) => {
+    onStockedUpdate = (event: any): void => {
         this.setState({isStocked: event.target.checked});
     }
 
-    onButtonClick = (event: any) => {
+    onButtonClick = (event: any): void => {
         $.ajax({
             contentType: 'application/json',
             dataType: 'json',

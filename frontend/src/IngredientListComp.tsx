@@ -10,11 +10,11 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
       super(props);
     }
 
-    makeComponent(ingredient: Ingredient) {
+    makeComponent(ingredient: Ingredient): JSX.Element {
       return <IngredientComp callback={this.props.comHub['ingredient-remove']} key={ingredient._id} data={ingredient} />
     }
 
-    filterCondition(ingredient: Ingredient) {
+    filterCondition(ingredient: Ingredient): boolean {
       return ingredient.name.toLowerCase().includes(this.state.filterText.toLowerCase());
     }
 
