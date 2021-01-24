@@ -13,6 +13,7 @@ db.initDb();
 app.get('/', (req: Request, res: Response) => res.redirect("/index.html"));
 
 app.get('/ingredient/:id', async (req: Request, res: Response) => {
+  console.log("Hit GET /ingredient/:id");
   const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
   if (doc) {
     res.status(200);
@@ -23,11 +24,13 @@ app.get('/ingredient/:id', async (req: Request, res: Response) => {
 });
 
 app.get('/ingredients', async (req: Request, res: Response) => {
+  console.log("Hit GET /ingredients");
   const all = await db.readAll(DatabaseController.INGREDIENTS_COL);
   res.json(all);
 });
 
 app.delete('/ingredient/:id', async (req: Request, res: Response) => {
+  console.log("Hit DELETE /ingredient/:id");
   const id: ObjectId = new ObjectId(req.params.id);
   const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
   if (doc) {
@@ -40,6 +43,7 @@ app.delete('/ingredient/:id', async (req: Request, res: Response) => {
 });
 
 app.put('/ingredient', async (req: Request, res: Response) => {
+  console.log("Hit PUT /ingredient");
   const body: IngredientPreWrite = req.body;
   let doc: Ingredient = await db.getByName(DatabaseController.INGREDIENTS_COL, body.name);
   if (doc) {
@@ -53,6 +57,7 @@ app.put('/ingredient', async (req: Request, res: Response) => {
 });
 
 app.patch('/ingredient', async (req: Request, res: Response) => {
+  console.log("Hit PATCH /ingredient");
   const body: Ingredient = req.body;
   let doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.body._id);
   if (doc) {
@@ -65,6 +70,7 @@ app.patch('/ingredient', async (req: Request, res: Response) => {
 });
 
 app.get('/recipe/:id', async (req: Request, res: Response) => {
+  console.log("Hit GET /recipe/:id");
   const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
   if (doc) {
     res.status(200);
@@ -75,11 +81,13 @@ app.get('/recipe/:id', async (req: Request, res: Response) => {
 });
 
 app.get('/recipes', async (req: Request, res: Response) => {
+  console.log("Hit GET /recipes");
   const all = await db.readRecipesInFull();
   res.json(all);
 });
 
 app.delete('/recipe/:id', async (req: Request, res: Response) => {
+  console.log("Hit DELETE /recipe/:id");
   const id: ObjectId = new ObjectId(req.params.id);
   const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
   if (doc) {
@@ -92,21 +100,25 @@ app.delete('/recipe/:id', async (req: Request, res: Response) => {
 });
 
 app.put('/recipe', async (req: Request, res: Response) => {
+  console.log("Hit PUT /recipe");
+  console.log(req.body);
   const body: RecipePreWrite = req.body;
   let doc: Recipe = await db.getByName(DatabaseController.RECIPE_COL, body.name);
   if (doc) {
-    res.status(400);
+    res.sendStatus(400);
   } else {
     const newBody = JSON.parse(JSON.stringify(body));
-    newBody.ingredients = body.ingredients.map(x => new ObjectId(x));
+    newBody.ingredient_ids = body.ingredient_ids.map(x => new ObjectId(x));
     await db.write(DatabaseController.RECIPE_COL, newBody);
     doc = await db.getByName(DatabaseController.RECIPE_COL, body.name);
+    console.log(doc);
     res.status(200);
     res.json(doc);
   }
 });
 
 app.patch('/recipe', async (req: Request, res: Response) => {
+  console.log("Hit PATCH /recipe");
   const body: Recipe = req.body;
   let doc: Recipe = await db.getById(DatabaseController.RECIPE_COL, req.body._id);
   if (doc) {

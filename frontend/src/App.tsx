@@ -62,13 +62,14 @@ export default class App extends React.Component<IProps, IState> {
 
     onRecipeRemove = (id: string) => {
         this.setState((state: IState, props: IProps) => {
-            return {ingredients: state.recipes.filter(x => x._id != id)}
+            return {recipes: state.recipes.filter(x => x._id != id)}
         });
     };
   
     onRecipeAdd = (newElem: Recipe) => {
+        console.log(newElem);
         this.setState((state: IState, props: IProps) => {
-            return {ingredients: state.recipes.concat(newElem)};
+            return {recipes: state.recipes.concat(newElem)};
         });
     };
 

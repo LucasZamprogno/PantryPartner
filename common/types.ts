@@ -12,7 +12,11 @@ export interface Ingredient extends MongoEntry, IngredientPreWrite {}
 
 export interface RecipePreWrite {
     name: string,
-    ingredients: string[]
+    ingredient_ids: string[]
 }
 
 export interface Recipe extends MongoEntry, IngredientPreWrite {}
+
+export interface RecipeJoined extends Recipe {
+    ingredients: Ingredient[]
+}

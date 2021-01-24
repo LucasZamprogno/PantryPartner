@@ -39,11 +39,13 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
         });
     }
 
-    getRecipeFromState() {
-        const stateCopy = JSON.parse(JSON.stringify(this.state));
-        stateCopy.ingredients = stateCopy.ingredients.map((x: Ingredient) => x._id);
-        delete stateCopy.expanded;
-        return stateCopy;
+    getRecipePreWriteFromState(): RecipePreWrite {
+        const name = this.state.name;
+        const ingredient_ids = this.state.ingredients.map(x => x._id);
+        return {
+            name: name,
+            ingredient_ids: ingredient_ids
+        };
     }
 
     onButtonClick = (event: any) => {
@@ -52,7 +54,7 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
             dataType: 'json',
             url: '/recipe/',
             type: 'PUT',
-            data: JSON.stringify(this.getRecipeFromState()),
+            data: JSON.stringify(this.getRecipePreWriteFromState()),
             success: (result) => {
                 this.props.callback(result);
             },
