@@ -10,22 +10,6 @@ export class DatabaseController {
     public static readonly RECIPE_COL = 'recipes';
 
     private db: Db | null = null;
-
-    public async getByName(col: string, name: string) {
-      return this.getByFilter(col, {name:name});
-    }
-    
-    public async getById(col: string, id: string) {
-        return this.getByFilter(col, {_id: new ObjectId(id)});
-    }
-
-    private async getByFilter(col: string, filter: any) {
-        console.log(`DatabaseController: Getting by filter on ${col}`);
-        if (col === DatabaseController.RECIPE_COL) {
-          return (await this.readRecipesInFull(filter))[0];
-        }
-        return await this.read(col, filter);
-    }
     
     public static getInstance() {
         if (!DatabaseController.instance) {
@@ -69,6 +53,22 @@ export class DatabaseController {
 
     public async remove(col: string, query: any) {
         this.db!.collection(col).deleteOne(query);
+    }
+
+    public async getByName(col: string, name: string) {
+      return this.getByFilter(col, {name:name});
+    }
+    
+    public async getById(col: string, id: string) {
+        return this.getByFilter(col, {_id: new ObjectId(id)});
+    }
+
+    private async getByFilter(col: string, filter: any) {
+        console.log(`DatabaseController: Getting by filter on ${col}`);
+        if (col === DatabaseController.RECIPE_COL) {
+          return (await this.readRecipesInFull(filter))[0];
+        }
+        return await this.read(col, filter);
     }
 
     public async readRecipesInFull(filter?: any): Promise<Recipe[]> {
