@@ -27,10 +27,12 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
 
     onIngredientAdd = (event: any): void => {
         this.setState((state: IState, props: IProps) => {
-            const selectedName = $("#ingredientSelector").val();
+            const selector = $("#ingredientSelector");
+            const selectedName = selector.val();
             for (const elem of this.props.options) {
                 if (elem.name === selectedName) {
                     const withNew = state.ingredients.concat(elem);
+                    selector.val("");
                     return {ingredients: withNew};
                 }
             }
