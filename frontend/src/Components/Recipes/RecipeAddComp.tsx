@@ -39,6 +39,13 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
         });
     }
 
+    onIngredientDelete = (event: any): void => {
+        const id = event.target.getAttribute("data-id");
+        this.setState((state: IState, props: IProps) => {
+          return {ingredients: state.ingredients.filter(x => x._id != id)}
+        });
+    }
+
     getRecipePreWriteFromState(): RecipePreWrite {
         const name = this.state.name;
         const ingredient_ids = this.state.ingredients.map(x => x._id);
@@ -65,12 +72,33 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
         });
     }
 
+    liRef(id: string) {
+        return `add-rec-li-${id}`;
+    }
+
     makeOptionList(): JSX.Element {
         const options = this.props.options.map(x => (<option value={x.name}/>))
         return (
             <datalist id="suggestions">
                 {options}
             </datalist>
+        )
+    }
+
+    makeIngredientListItem(ingredient: Ingredient): JSX.Element {
+        const id = ingredient._id;
+        return (
+            <li ref={this.liRef(id)}>
+                {ingredient.name} (<span data-id={id} className="delButton" onClick={this.onIngredientDelete}>X</span>)
+            </li>
+        )
+    }
+
+    makeIngredientsList(): JSX.Element {
+        return (
+        <ul>
+            {this.state.ingredients.map(x => this.makeIngredientListItem(x))}
+        </ul>
         )
     }
 
@@ -84,9 +112,7 @@ export default class IngredientAddComp extends React.Component<IProps, IState> {
                         <input className="form-control" type="text" placeholder="Ingredient name" onChange={this.onNameUpdate} />
                     </div>
                     <p>Ingredients:</p>
-                    <ul>
-                        {this.state.ingredients.map(x => (<li>{x.name}</li>))}
-                    </ul>
+                    {this.makeIngredientsList()}
                     <div className="input-group mb-3">
                         <div className="input-group-append">
                             <input id="ingredientSelector" type="text" list="suggestions" className="form-control"></input>
