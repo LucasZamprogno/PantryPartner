@@ -1,9 +1,9 @@
 import {IRouter} from "./IRouter"
 import {Request, Response} from "express";
-import {Recipe, RecipePreWrite} from "../../common/types";
+import {Recipe, RecipePreWrite} from "../../../common/types";
 import {ObjectId} from 'mongodb';
-import {RecipeDatabaseController} from "./RecipeDatabaseController";
-import {IngredientDatabaseController} from "./IngredientDatabaseController";
+import {RecipeDatabaseController} from "../Controllers/RecipeDatabaseController";
+import {IngredientDatabaseController} from "../Controllers/IngredientDatabaseController";
 
 export default class RecipeRouter implements IRouter {
     private recipeDB: RecipeDatabaseController;

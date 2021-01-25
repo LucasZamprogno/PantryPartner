@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
-import IngredientRouter from "./IngredientRouter";
-import RecipeRouter from "./RecipeRouter";
+import IngredientRouter from "./Routers/IngredientRouter";
+import RecipeRouter from "./Routers/RecipeRouter";
 
 const app = express();
 app.use(bodyParser.json())

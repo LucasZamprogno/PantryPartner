@@ -1,5 +1,5 @@
 import {Db, DeleteWriteOpResultObject, MongoClient, UpdateWriteOpResult, WriteOpResult} from "mongodb";
-import { MongoEntry } from "../../common/types";
+import { MongoEntry } from "../../../common/types";
 import {ObjectId} from 'mongodb';
 
 export interface MongoResponse {

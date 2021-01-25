@@ -1,7 +1,7 @@
 import * as React from 'react';
 import RecipeComp from './RecipeComp';
-import {Recipe} from '../../common/types'
-import FilterableListComp, {IProps} from './FilterableListComp';
+import {Recipe} from '../../../../common/types'
+import FilterableListComp, {IProps} from '../FilterableListComp';
 import RecipeAddComp from './RecipeAddComp';
 
 export default class RecipeListComp extends FilterableListComp<Recipe> {

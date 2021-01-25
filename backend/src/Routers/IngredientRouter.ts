@@ -1,8 +1,8 @@
 import {IRouter} from "./IRouter"
 import {Request, Response} from "express";
-import {Ingredient, IngredientPreWrite} from "../../common/types";
+import {Ingredient, IngredientPreWrite} from "../../../common/types";
 import {ObjectId} from 'mongodb';
-import {IngredientDatabaseController} from "./IngredientDatabaseController";
+import {IngredientDatabaseController} from "../Controllers/IngredientDatabaseController";
 
 export default class IngredientRouter implements IRouter {
     private ingredientDB: IngredientDatabaseController;

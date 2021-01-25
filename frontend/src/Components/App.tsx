@@ -1,9 +1,9 @@
 import * as React from 'react';
 import $ from 'jquery';
-import { Ingredient, Recipe } from '../../common/types';
-import IngredientListComp from './IngredientListComp';
+import { Ingredient, Recipe } from '../../../common/types';
+import IngredientListComp from './Ingredients/IngredientListComp';
 import NavbarComp from './NavbarComp';
-import RecipeListComp from './RecipeListComp';
+import RecipeListComp from './Recipes/RecipeListComp';
 
 export interface ComHub {
     "ingredient-add": (ingredient: Ingredient) => void,

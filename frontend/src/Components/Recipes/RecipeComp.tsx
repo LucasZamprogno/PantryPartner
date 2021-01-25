@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Recipe} from '../../common/types'
+import {Recipe} from '../../../../common/types'
 import $ from 'jquery';
 import Collapse from "react-bootstrap/Collapse";
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import $ from 'jquery';
-import { IngredientPreWrite } from '../../common/types';
+import { IngredientPreWrite } from '../../../../common/types';
 
 export interface IProps {
     callback: (data: any) => void;

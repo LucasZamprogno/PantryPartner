@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MongoEntry} from '../../common/types';
+import { MongoEntry} from '../../../common/types';
 import { ComHub } from './App';
 
 export interface IProps<T> {

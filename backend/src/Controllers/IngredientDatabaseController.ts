@@ -1,4 +1,4 @@
-import { Ingredient } from "../../common/types";
+import { Ingredient } from "../../../common/types";
 import { DatabaseController } from "./DatabaseController";
 
 export class IngredientDatabaseController extends DatabaseController<Ingredient> {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import IngredientComp from './IngredientComp';
-import {Ingredient} from '../../common/types'
-import FilterableListComp, {IProps} from './FilterableListComp';
+import {Ingredient} from '../../../../common/types'
+import FilterableListComp, {IProps} from '../FilterableListComp';
 import IngredientAddComp from './IngredientAddComp';
 
 export default class IngredientListComp extends FilterableListComp<Ingredient> {
