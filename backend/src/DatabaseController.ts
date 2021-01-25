@@ -1,84 +1,65 @@
-import {Db, MongoClient} from "mongodb";
-import { MongoEntry, Recipe } from "../../common/types";
+import {Db, DeleteWriteOpResultObject, MongoClient, UpdateWriteOpResult, WriteOpResult} from "mongodb";
+import { MongoEntry } from "../../common/types";
 import {ObjectId} from 'mongodb';
 
-export abstract class DatabaseController {
+export interface MongoResponse {
+    n: number,
+    ok: number
+}
 
-    private static instance: DatabaseController;
-    private readonly url = "mongodb://localhost:27017/mydb";
+export abstract class DatabaseController<T> {
+
     public static readonly INGREDIENTS_COL = 'ingredients';
     public static readonly RECIPE_COL = 'recipes';
+    private readonly url = "mongodb://localhost:27017/mydb";
+    protected col: string;
+    protected db: Db | null = null;
 
-    private db: Db | null = null;
-
-    protected constructor() {
+    protected constructor(col: string) {
+        this.col = col;
         console.log("DatabaseController init");
     }
 
-    public async initDb() {
+    public async initDb(): Promise<void> {
         this.db = (await MongoClient.connect(this.url)).db()
     }
 
-    public async write(col: string, doc: any) {
-        this.db!.collection(col).insertOne(doc);
+    public async write(doc: any): Promise<WriteOpResult> {
+        return this.db!.collection(this.col).insertOne(doc);
     }
 
-    public async read(col: string, query: any) {
-        return this.db!.collection(col).findOne(query);
+    public async read(query: any): Promise<T | null> {
+        return this.db!.collection(this.col).findOne(query);
     }
 
-    public async readAll(col: string) {
-        return this.db!.collection(col).find().toArray();
+    public async readAll(): Promise<T[]> {
+        return this.db!.collection(this.col).find().toArray();
     }
 
-    public async replace(col: string, doc: MongoEntry) {
+    public async replace(doc: MongoEntry): Promise<UpdateWriteOpResult> {
         const id = new ObjectId(doc._id);
         const toUpdate = JSON.parse(JSON.stringify(doc));
         delete toUpdate._id;
         const changeOp = {$set: toUpdate};
-        this.db!.collection(col).updateOne({"_id": id}, changeOp);
+        return this.db!.collection(this.col).updateOne({"_id": id}, changeOp);
     }
 
-    public async set(col: string, query: any, prop: string, val: any) {
+    public async set(query: any, prop: string, val: any): Promise<UpdateWriteOpResult> {
         const change = { $set: {[prop]: val}};
-        this.db!.collection(col).updateOne(query, change);
+        return this.db!.collection(this.col).updateOne(query, change);
     }
 
-    public async remove(col: string, query: any) {
-        this.db!.collection(col).deleteOne(query);
+    public async remove(query: any): Promise<DeleteWriteOpResultObject> {
+        return this.db!.collection(this.col).deleteOne(query);
     }
 
-    public async getByName(col: string, name: string) {
-      return this.getByFilter(col, {name:name});
+    public async getByName(name: string): Promise<T | null> {
+        return this.getByFilter({name:name});
     }
     
-    public async getById(col: string, id: string) {
-        return this.getByFilter(col, {_id: new ObjectId(id)});
+    public async getById(id: string): Promise<T | null> {
+        return this.getByFilter({_id: new ObjectId(id)});
     }
 
-    private async getByFilter(col: string, filter: any) {
-        console.log(`DatabaseController: Getting by filter on ${col}`);
-        if (col === DatabaseController.RECIPE_COL) {
-          return (await this.readRecipesInFull(filter))[0];
-        }
-        return await this.read(col, filter);
-    }
-
-    public async readRecipesInFull(filter?: any): Promise<Recipe[]> {
-        const pipeline: any[] = [];
-        if (filter) {
-            pipeline.push({$match: filter});
-        }
-        pipeline.push({
-            $lookup:
-              {
-                from: DatabaseController.INGREDIENTS_COL,
-                localField: "ingredient_ids",
-                foreignField: "_id",
-                as: "ingredients"
-              }
-         });
-         const res: Recipe[] | undefined = await this.db?.collection(DatabaseController.RECIPE_COL).aggregate(pipeline).toArray();
-         return res ? res : [];
-    }
+    protected abstract getByFilter(filter: any): Promise<T | null>;
 }

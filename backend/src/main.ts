@@ -1,20 +1,23 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import {Ingredient, IngredientPreWrite, Recipe, RecipePreWrite} from "../../common/types";
-import { DatabaseController } from "./DatabaseController";
 import {ObjectId} from 'mongodb';
+import { IngredientDatabaseController } from "./IngredientDatabaseController";
+import { RecipeDatabaseController } from "./RecipeDatabaseController";
 
 const app = express();
 app.use(bodyParser.json())
 const PORT = 8000;
-const db = DatabaseController.getInstance();
-db.initDb();
+const IngredientDBC = new IngredientDatabaseController();
+const RecipeDBC = new RecipeDatabaseController();
+IngredientDBC.initDb();
+RecipeDBC.initDb();
 
 app.get('/', (req: Request, res: Response) => res.redirect("/index.html"));
 
 app.get('/ingredient/:id', async (req: Request, res: Response) => {
   console.log("Hit GET /ingredient/:id");
-  const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
+  const doc = await IngredientDBC.getById(req.params.id);
   if (doc) {
     res.status(200);
     res.json(doc);
@@ -25,16 +28,16 @@ app.get('/ingredient/:id', async (req: Request, res: Response) => {
 
 app.get('/ingredients', async (req: Request, res: Response) => {
   console.log("Hit GET /ingredients");
-  const all = await db.readAll(DatabaseController.INGREDIENTS_COL);
+  const all = await IngredientDBC.readAll();
   res.json(all);
 });
 
 app.delete('/ingredient/:id', async (req: Request, res: Response) => {
   console.log("Hit DELETE /ingredient/:id");
   const id: ObjectId = new ObjectId(req.params.id);
-  const doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.params.id);
+  const doc = await IngredientDBC.getById(req.params.id);
   if (doc) {
-    await db.remove(DatabaseController.INGREDIENTS_COL, {_id:id});
+    await IngredientDBC.remove({_id:id});
     res.status(200);
     res.json(doc);
   } else {
@@ -45,12 +48,12 @@ app.delete('/ingredient/:id', async (req: Request, res: Response) => {
 app.put('/ingredient', async (req: Request, res: Response) => {
   console.log("Hit PUT /ingredient");
   const body: IngredientPreWrite = req.body;
-  let doc: Ingredient = await db.getByName(DatabaseController.INGREDIENTS_COL, body.name);
+  let doc = await IngredientDBC.getByName(body.name);
   if (doc) {
     res.status(400);
   } else {
-    await db.write(DatabaseController.INGREDIENTS_COL, body);
-    doc = await db.getByName(DatabaseController.INGREDIENTS_COL, body.name);
+    await IngredientDBC.write(body);
+    doc = await IngredientDBC.getByName(body.name);
     res.status(200);
     res.json(doc);
   }
@@ -59,9 +62,9 @@ app.put('/ingredient', async (req: Request, res: Response) => {
 app.patch('/ingredient', async (req: Request, res: Response) => {
   console.log("Hit PATCH /ingredient");
   const body: Ingredient = req.body;
-  let doc: Ingredient = await db.getById(DatabaseController.INGREDIENTS_COL, req.body._id);
+  let doc = await IngredientDBC.getById(req.body._id);
   if (doc) {
-    await db.replace(DatabaseController.INGREDIENTS_COL, body);
+    await IngredientDBC.replace(body);
     res.status(200);
     res.json(body); // Change if this ever is no longer valid
   } else {
@@ -71,7 +74,7 @@ app.patch('/ingredient', async (req: Request, res: Response) => {
 
 app.get('/recipe/:id', async (req: Request, res: Response) => {
   console.log("Hit GET /recipe/:id");
-  const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  const doc = await RecipeDBC.getById(req.params.id);
   if (doc) {
     res.status(200);
     res.json(doc);
@@ -82,16 +85,16 @@ app.get('/recipe/:id', async (req: Request, res: Response) => {
 
 app.get('/recipes', async (req: Request, res: Response) => {
   console.log("Hit GET /recipes");
-  const all = await db.readRecipesInFull();
+  const all = await RecipeDBC.readRecipesInFull();
   res.json(all);
 });
 
 app.delete('/recipe/:id', async (req: Request, res: Response) => {
   console.log("Hit DELETE /recipe/:id");
   const id: ObjectId = new ObjectId(req.params.id);
-  const doc: Ingredient = await db.getById(DatabaseController.RECIPE_COL, req.params.id);
+  const doc = await RecipeDBC.getById(req.params.id);
   if (doc) {
-    await db.remove(DatabaseController.RECIPE_COL, {_id:id});
+    await RecipeDBC.remove({_id:id});
     res.status(200);
     res.json(doc);
   } else {
@@ -103,14 +106,14 @@ app.put('/recipe', async (req: Request, res: Response) => {
   console.log("Hit PUT /recipe");
   console.log(req.body);
   const body: RecipePreWrite = req.body;
-  let doc: Recipe = await db.getByName(DatabaseController.RECIPE_COL, body.name);
+  let doc = await RecipeDBC.getByName(body.name);
   if (doc) {
     res.sendStatus(400);
   } else {
     const newBody = JSON.parse(JSON.stringify(body));
     newBody.ingredient_ids = body.ingredient_ids.map(x => new ObjectId(x));
-    await db.write(DatabaseController.RECIPE_COL, newBody);
-    doc = await db.getByName(DatabaseController.RECIPE_COL, body.name);
+    await RecipeDBC.write(newBody);
+    doc = await RecipeDBC.getByName(body.name);
     console.log(doc);
     res.status(200);
     res.json(doc);
@@ -120,9 +123,9 @@ app.put('/recipe', async (req: Request, res: Response) => {
 app.patch('/recipe', async (req: Request, res: Response) => {
   console.log("Hit PATCH /recipe");
   const body: Recipe = req.body;
-  let doc: Recipe = await db.getById(DatabaseController.RECIPE_COL, req.body._id);
+  let doc = await RecipeDBC.getById(req.body._id);
   if (doc) {
-    await db.replace(DatabaseController.RECIPE_COL, body);
+    await RecipeDBC.replace(body);
     res.status(200);
     res.json(req.body); // Change if this ever is no longer valid
   } else {
