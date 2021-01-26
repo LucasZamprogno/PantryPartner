@@ -11,7 +11,7 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
     }
 
     makeComponent(recipe: Recipe): JSX.Element {
-      return <RecipeComp callback={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe} />
+      return <RecipeComp onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
     }
 
     filterCondition(recipe: Recipe): boolean {

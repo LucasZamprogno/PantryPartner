@@ -15,7 +15,7 @@ export interface RecipePreWrite {
     ingredient_ids: string[]
 }
 
-export interface Recipe extends MongoEntry, IngredientPreWrite {}
+export interface Recipe extends MongoEntry, RecipePreWrite {}
 
 export interface RecipeJoined extends Recipe {
     ingredients: Ingredient[]
