@@ -28,11 +28,16 @@ export default class RecipeComp extends React.Component<IProps, IState> {
       super(props);
       const ingCopy = JSON.parse(JSON.stringify(this.props.data));
       ingCopy.expanded = false;
-      ingCopy.metaState = MetaState.editing;
+      ingCopy.metaState = MetaState.default;
       this.state = ingCopy;
     }
 
-    toggleExpanded = () => this.setState((state: IState, props: IProps) => {return {expanded: !state.expanded}})
+    toggleExpanded = () => this.setState((state: IState, props: IProps) => {
+      if (this.state.metaState === MetaState.editing) {
+        return {expanded: true}; // Don't allow collapsing of editing, must save or cancel first
+      }
+      return {expanded: !state.expanded}
+    })
 
     // Edit and add // 
 
@@ -45,9 +50,16 @@ export default class RecipeComp extends React.Component<IProps, IState> {
 
     // Edit related //
     getRecipeFromState(): Recipe {
-      const stateCopy = JSON.parse(JSON.stringify(this.props.data));
-      delete stateCopy.expanded;
-      return stateCopy;
+      const recipeData: Recipe = {
+        _id: this.state._id,
+        name: this.state.name,
+        ingredient_ids: this.state.ingredients.map(x => x._id)
+      };
+      return recipeData;
+    }
+
+    onEditClick= (event: any): void => {
+      this.setState({metaState: MetaState.editing});
     }
 
     onDeleteClick = (event: any): void => {
@@ -73,6 +85,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
           data: JSON.stringify(this.getRecipeFromState()),
           success: (result: Recipe) => {
             this.setState(result);
+            this.setState({metaState: MetaState.default});
           },
           error:(err) => {
               // TODO add proper error handling
@@ -175,7 +188,6 @@ export default class RecipeComp extends React.Component<IProps, IState> {
         case MetaState.default:
           return (
             <>
-              <input className="form-control" type="text" placeholder="New recipe name" defaultValue={this.state.name} onChange={this.onNameUpdate} />
               <p>Ingredients:</p>
               {this.makeIngredientsList()}
             </>
@@ -215,7 +227,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
     renderCRUDbuttons(): JSX.Element {
       switch(this.state.metaState) {
         case MetaState.default:
-          return <></>;
+          return <button type="button" className="btn btn-outline-secondary p-1" onClick={this.onEditClick}>Edit</button>;
         case MetaState.editing:
           return (
           <>
