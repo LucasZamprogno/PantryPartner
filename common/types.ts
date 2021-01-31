@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export interface MongoEntry {
     _id: string
 }
@@ -12,7 +14,7 @@ export interface Ingredient extends MongoEntry, IngredientPreWrite {}
 
 export interface RecipePreWrite {
     name: string,
-    ingredient_ids: string[]
+    ingredient_ids: (string | ObjectId)[]
 }
 
 export interface Recipe extends MongoEntry, RecipePreWrite {}
