@@ -1,9 +1,23 @@
+import { ObjectId, UpdateWriteOpResult, WriteOpResult } from "mongodb";
 import {Recipe} from "../../../common/types";
 import {DatabaseController} from "./DatabaseController";
 
 export class RecipeDatabaseController extends DatabaseController<Recipe> {
     constructor() {
         super(DatabaseController.RECIPE_COL);
+    }
+    
+    public async write(doc: any): Promise<WriteOpResult> {
+        doc.ingredient_ids = doc.ingredient_ids.map((x: string) => new ObjectId(x));
+        return super.write(doc);
+    }
+    
+    public async replace(doc: any): Promise<UpdateWriteOpResult> {
+        const toUpdate = {
+            name: doc.name,
+            ingredient_ids: doc.ingredient_ids.map((x: string) => new ObjectId(x))
+        }
+        return super.replace(doc._id, toUpdate);
     }
 
     public async readRecipesInFull(filter?: any): Promise<Recipe[]> {
@@ -28,4 +42,3 @@ export class RecipeDatabaseController extends DatabaseController<Recipe> {
         return (await this.readRecipesInFull(filter))[0];
     }
 }
-//return await this.read(filter);

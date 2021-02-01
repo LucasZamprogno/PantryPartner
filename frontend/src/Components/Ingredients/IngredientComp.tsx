@@ -1,93 +1,80 @@
 import * as React from 'react';
-import {Ingredient} from '../../../../common/types'
-import $ from 'jquery';
-import Collapse from "react-bootstrap/Collapse";
+import {Ingredient, IngredientPreWrite} from '../../../../common/types'
+import MainEntryComp, { EntryProps, MetaState } from '../MainEntryComp';
 
-interface IProps {
-    data: Ingredient,
-    callback: (id: string) => void
-}
+export default class IngredientComp extends MainEntryComp<Ingredient> {
 
-interface IState extends Ingredient {
-  expanded: boolean
-}
+    protected readonly endpoint: string = "ingredient";
+    protected readonly entryType: string = "ingredient"; // Add new _______
 
-export default class IngredientComp extends React.Component<IProps, IState> {
-
-    constructor(props: IProps) {
+    constructor(props: EntryProps<Ingredient>) {
       super(props);
-      const ingCopy = JSON.parse(JSON.stringify(this.props.data));
-      ingCopy.expanded = false;
-      this.state = ingCopy;
     }
 
-    getIngredientFromState(): Ingredient {
-      const stateCopy = JSON.parse(JSON.stringify(this.state));
-      delete stateCopy.expanded;
-      return stateCopy;
+    getDataPreWriteString(): string {
+      const ingredientPreWrite: IngredientPreWrite = {
+        name: this.state.data.name,
+        isStocked: this.state.data.isStocked,
+        isStaple: this.state.data.isStaple
+      }
+      return JSON.stringify(ingredientPreWrite);
     }
 
     onStapleUpdate = (event: any): void => {
-        this.setState({isStaple: event.target.checked});
+        const newData = this.getUpdatedStateData({isStaple: event.target.checked});
+        this.setState({data: newData});
     }
 
     onStockedUpdate = (event: any): void => {
-        this.setState({isStocked: event.target.checked});
+        const newData = this.getUpdatedStateData({isStocked: event.target.checked});
+        this.setState({data: newData});
     }
 
-    onDeleteClick = (event: any): void => {
-      $.ajax({
-          url: '/ingredient/' + this.props.data._id,
-          type: 'DELETE',
-          success: (result) => {
-              this.props.callback(result._id);
-          },
-          error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
-          },
-      });
-    }
-    
-    onUpdateClick = (event: any): void => {
-      $.ajax({
-          contentType: 'application/json',
-          dataType: 'json',
-          url: '/ingredient',
-          type: 'PATCH',
-          data: JSON.stringify(this.getIngredientFromState()),
-          success: (result: Ingredient) => {
-            this.setState(result);
-          },
-          error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
-          },
-      });
+    onNameUpdate = (event: any): void => {
+        const newData = this.getUpdatedStateData({name: event.target.value});
+        this.setState({data: newData});
     }
 
-    render() {
+    renderBody(): JSX.Element {
       const stapleId: string = this.props.data._id + "-staple";
       const stockedId: string = this.props.data._id + "-stocked";
+      let disabled = false;
+      let nameInput = <div>
+          <input defaultValue={this.state.data.name} className="form-control" type="text" placeholder="Ingredient name" onChange={this.onNameUpdate} />
+      </div>
+      if (this.state.metaState === MetaState.default) {
+        disabled = true;
+        nameInput = <></>;
+      }
       return (
-      <div className="card my-1">
-        <div className="card-body p-2">
-          <h5 className="card-title" onClick={() => this.setState((state: IState, props: IProps) => {return {expanded: !state.expanded}})}>{this.props.data.name}</h5>
-          <Collapse in={this.state.expanded}>
-            <div id={this.props.data._id}>
-              <div className="form-check">
-                <input type="checkbox" defaultChecked={this.state.isStaple} className="form-check-input" id={stapleId}  onChange={this.onStapleUpdate}/>
-                <label className="form-check-label" htmlFor={stapleId}>Staple ingredient</label>
-              </div>
-              <div className="form-check">
-                <input type="checkbox" defaultChecked={this.state.isStocked} className="form-check-input" id={stockedId}  onChange={this.onStockedUpdate}/>
-                <label className="form-check-label" htmlFor={stockedId}>Have stocked</label>
-              </div>
-              <button type="button" className="btn btn-outline-secondary p-1 mr-2" onClick={this.onDeleteClick}>Delete</button>
-              <button type="button" className="btn btn-outline-secondary p-1" onClick={this.onUpdateClick}>Update</button>
-            </div>
-          </Collapse>
+        <>
+        {nameInput}
+        <div className="form-check">
+          <input type="checkbox" disabled={disabled} defaultChecked={this.state.data.isStaple} className="form-check-input" id={stapleId} onChange={this.onStapleUpdate}/>
+          <label className="form-check-label" htmlFor={stapleId}>Staple ingredient</label>
         </div>
-      </div>);
+        <div className="form-check">
+          <input type="checkbox" disabled={disabled} defaultChecked={this.state.data.isStocked} className="form-check-input" id={stockedId} onChange={this.onStockedUpdate}/>
+          <label className="form-check-label" htmlFor={stockedId}>Have stocked</label>
+        </div>
+        </>
+      )
+    }
+
+    renderCRUDbuttons(): JSX.Element {
+      switch(this.state.metaState) {
+        case MetaState.default:
+          return <button type="button" className="btn btn-outline-secondary p-1" onClick={this.onEditClick}>Edit</button>;
+        case MetaState.editing:
+          return (
+          <>
+            <button type="button" className="btn btn-outline-secondary p-1 mr-2" onClick={this.onDeleteClick}>Delete</button>
+            <button type="button" className="btn btn-outline-secondary p-1" onClick={this.onUpdateClick}>Update</button>
+          </>);
+        case MetaState.creating:
+          return (<div>
+              <button className="btn btn-primary" onClick={this.onAddClick}>Add</button>
+          </div>);
+      }
     }
   }

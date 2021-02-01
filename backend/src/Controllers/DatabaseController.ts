@@ -36,17 +36,8 @@ export abstract class DatabaseController<T> {
         return this.db!.collection(this.col).find().toArray();
     }
 
-    public async replace(doc: MongoEntry): Promise<UpdateWriteOpResult> {
-        const id = new ObjectId(doc._id);
-        const toUpdate = JSON.parse(JSON.stringify(doc));
-        delete toUpdate._id;
-        const changeOp = {$set: toUpdate};
-        return this.db!.collection(this.col).updateOne({"_id": id}, changeOp);
-    }
-
-    public async set(query: any, prop: string, val: any): Promise<UpdateWriteOpResult> {
-        const change = { $set: {[prop]: val}};
-        return this.db!.collection(this.col).updateOne(query, change);
+    public async replace(id: string, toUpdate: any): Promise<UpdateWriteOpResult> {
+        return this.db!.collection(this.col).updateOne({"_id": new ObjectId(id)}, {$set: toUpdate});
     }
 
     public async remove(query: any): Promise<DeleteWriteOpResultObject> {

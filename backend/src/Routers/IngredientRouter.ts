@@ -52,8 +52,9 @@ export default class IngredientRouter implements IRouter {
           let doc = await this.ingredientDB.getById(req.body._id);
           if (doc) {
             await this.ingredientDB.replace(body);
+            let saved = await this.ingredientDB.getById(req.body._id);
             res.status(200);
-            res.json(body); // Change if this ever is no longer valid
+            res.json(saved); // Change if this ever is no longer valid
           } else {
             res.sendStatus(400);
           }

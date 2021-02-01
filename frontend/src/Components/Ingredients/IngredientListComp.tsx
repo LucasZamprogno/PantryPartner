@@ -1,8 +1,8 @@
 import * as React from 'react';
-import IngredientComp from './IngredientComp';
 import {Ingredient} from '../../../../common/types'
 import FilterableListComp, {IProps} from '../FilterableListComp';
-import IngredientAddComp from './IngredientAddComp';
+import { MetaState } from '../MainEntryComp';
+import IngredientComp from './IngredientComp';
 
 export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
@@ -11,7 +11,12 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
     }
 
     makeComponent(ingredient: Ingredient): JSX.Element {
-      return <IngredientComp callback={this.props.comHub['ingredient-remove']} key={ingredient._id} data={ingredient} />
+      return <IngredientComp 
+        initialState={MetaState.default} 
+        onDelete={this.props.comHub['ingredient-remove']} 
+        onAdd={this.props.comHub['ingredient-add']} 
+        onUpdate={()=>{}} key={ingredient._id} 
+        data={ingredient} />
     }
 
     filterCondition(ingredient: Ingredient): boolean {
@@ -19,13 +24,22 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
     }
 
     render() {
+      const ingredient: Ingredient = {
+        _id: "",
+        name: "",
+        isStaple: false,
+        isStocked: false
+      }
       return (
-        <div>
+        <>
           {this.renderList()}
-          <div className="row">
-            <IngredientAddComp callback={this.props.comHub['ingredient-add']}/>
-          </div>
-        </div>
+          <IngredientComp 
+          initialState={MetaState.creating} 
+          onDelete={this.props.comHub['ingredient-remove']} 
+          onAdd={this.props.comHub['ingredient-add']} 
+          onUpdate={()=>{}} key={ingredient._id} 
+          data={ingredient} />
+        </>
       )
     }
   }
