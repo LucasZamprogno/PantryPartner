@@ -1,8 +1,8 @@
 import * as React from 'react';
-import RecipeComp from './RecipeComp';
-import {Recipe, RecipeJoined} from '../../../../common/types'
+import {Recipe} from '../../../../common/types'
 import FilterableListComp, {IProps} from '../FilterableListComp';
-import {MetaState} from './RecipeComp';
+import RecipeComp from './RecipeComp';
+import {MetaState} from '../MainEntryComp'
 
 export default class RecipeListComp extends FilterableListComp<Recipe> {
 
@@ -11,7 +11,13 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
     }
 
     makeComponent(recipe: Recipe): JSX.Element {
-      return <RecipeComp initialState={MetaState.default} onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
+      return <RecipeComp 
+        initialState={MetaState.default} 
+        onDelete={this.props.comHub['recipe-remove']} 
+        key={recipe._id} data={recipe} 
+        onAdd={this.props.comHub['recipe-add']} 
+        getIngredients={this.props.comHub['get-ingredients']} 
+        onUpdate={()=>{}}/>
     }
 
     filterCondition(recipe: Recipe): boolean {
@@ -19,7 +25,7 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
     }
 
     render() {
-      const recipe: RecipeJoined = {
+      const recipe: Recipe = {
         _id: "",
         name: "",
         ingredient_ids: [],
@@ -28,7 +34,13 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
       return (
         <>
           {this.renderList()}
-          <RecipeComp initialState={MetaState.creating} onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
+          <RecipeComp 
+            initialState={MetaState.creating} 
+            onDelete={this.props.comHub['recipe-remove']} 
+            key={recipe._id} data={recipe} 
+            onAdd={this.props.comHub['recipe-add']} 
+            getIngredients={this.props.comHub['get-ingredients']} 
+        onUpdate={()=>{}}/>
         </>
       )
     }

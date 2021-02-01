@@ -1,145 +1,59 @@
 import * as React from 'react';
-import {Ingredient, Recipe, RecipeJoined, RecipePreWrite} from '../../../../common/types'
+import {Ingredient, Recipe} from '../../../../common/types'
 import $ from 'jquery';
-import Collapse from "react-bootstrap/Collapse";
+import MainEntryComp, { EntryProps, MetaState } from '../MainEntryComp';
 
-export enum MetaState {
-  default,
-  editing,
-  creating
-}
+export default class RecipeComp extends MainEntryComp<Recipe> {
 
-interface IProps {
-    data: Recipe,
-    options: Ingredient[],
-    initialState: MetaState,
-    onDelete: (id: string) => void,
-    onAdd: (recipe: Recipe) => void,
-    onUpdate: (recipe: Recipe) => void,
-}
+    protected readonly endpoint: string = "recipe";
+    protected readonly entryType: string = "recipe"; // Add new _______
 
-interface IState extends RecipeJoined {
-  expanded: boolean,
-  metaState: MetaState
-}
-
-export default class RecipeComp extends React.Component<IProps, IState> {
-
-    constructor(props: IProps) {
+    constructor(props: EntryProps<Recipe>) {
       super(props);
-      const ingCopy = JSON.parse(JSON.stringify(this.props.data));
-      ingCopy.expanded = false;
-      ingCopy.metaState = props.initialState;
-      this.state = ingCopy;
-    }
-
-    toggleExpanded = () => this.setState((state: IState, props: IProps) => {
-      if (this.state.metaState === MetaState.editing) {
-        return {expanded: true}; // Don't allow collapsing of editing, must save or cancel first
+      if (!props.getIngredients) {
+          throw new Error("RecipeComp needs getIngredients function");
       }
-      return {expanded: !state.expanded}
-    })
-
-    // Edit and add // 
+    }
 
     onIngredientDelete = (event: any): void => {
         const id = event.target.getAttribute("data-id");
-        this.setState((state: IState, props: IProps) => {
-          return {ingredients: state.ingredients.filter(x => x._id != id)}
+        this.setState((state, props) => {
+            const newIngredients = state.data.ingredients.filter(x => x._id != id);
+            const newData = this.getUpdatedStateData({ingredients: newIngredients});
+            return {data: newData}
         });
-    }
-
-    // Edit related //
-    getRecipeFromState(): Recipe {
-      const recipeData: Recipe = {
-        _id: this.state._id,
-        name: this.state.name,
-        ingredient_ids: this.state.ingredients.map(x => x._id)
-      };
-      return recipeData;
-    }
-
-    onEditClick= (event: any): void => {
-      this.setState({metaState: MetaState.editing});
-    }
-
-    onDeleteClick = (event: any): void => {
-      $.ajax({
-          url: '/recipe/' + this.props.data._id,
-          type: 'DELETE',
-          success: (result) => {
-              this.props.onDelete(result._id);
-          },
-          error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
-          },
-      });
-    }
-    
-    onUpdateClick = (event: any): void => {
-      $.ajax({
-          contentType: 'application/json',
-          dataType: 'json',
-          url: '/recipe',
-          type: 'PATCH',
-          data: JSON.stringify(this.getRecipeFromState()),
-          success: (result: Recipe) => {
-            this.setState(result);
-            this.setState({metaState: MetaState.default});
-          },
-          error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
-          },
-      });
     }
 
     // Add related //
     onNameUpdate = (event: any): void => {
-        this.setState({name: event.target.value});
+        const newData = this.getUpdatedStateData({name: event.target.value});
+        this.setState({data: newData});
     }
 
     onIngredientAdd = (event: any): void => {
-        this.setState((state: IState, props: IProps) => {
+        this.setState((state, props) => {
             const selector = $("#ingredientSelector");
             const selectedName = selector.val();
-            for (const elem of this.props.options) {
+            for (const elem of this.props.getIngredients!()) {
                 if (elem.name === selectedName) {
-                    const withNew = state.ingredients.concat(elem);
+                    const withNew = state.data.ingredients.concat(elem);
+                    const newData = this.getUpdatedStateData({ingredients: withNew})
                     selector.val("");
-                    return {ingredients: withNew};
+                    return {data: newData};
                 }
             }
-            return {ingredients: state.ingredients};
-            // TODO error handle
+            return {data: state.data}; // TODO error handle better            
         });
     }
 
-    getRecipePreWriteFromState(): RecipePreWrite {
-        const name = this.state.name;
-        const ingredient_ids = this.state.ingredients.map(x => x._id);
-        return {
+    getDataPreWriteString(): string {
+        const name = this.state.data.name;
+        const ingredient_ids = this.state.data.ingredients.map(x => x._id);
+        const recipePreWrite = {
             name: name,
             ingredient_ids: ingredient_ids
         };
-    }
-
-    onAddClick = (event: any): void => {
-        $.ajax({
-            contentType: 'application/json',
-            dataType: 'json',
-            url: '/recipe/',
-            type: 'PUT',
-            data: JSON.stringify(this.getRecipePreWriteFromState()),
-            success: (result) => {
-                this.props.onAdd(result);
-            },
-            error:(err) => {
-                // TODO add proper error handling
-                console.log(err); // And maybe a logging framework
-            },
-        });
+        return JSON.stringify(recipePreWrite);
     }
 
     // Rendering // 
@@ -148,7 +62,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
     }
 
     makeOptionList(): JSX.Element {
-        const options = this.props.options.map(x => (<option value={x.name}/>))
+        const options = this.props.getIngredients!().map(x => (<option value={x.name}/>))
         return (
             <datalist id="suggestions">
                 {options}
@@ -159,7 +73,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
     makeIngredientsList(): JSX.Element {
         return (
         <ul>
-            {this.state.ingredients.map(x => this.makeIngredientListItem(x))}
+            {this.state.data.ingredients.map(x => this.makeIngredientListItem(x))}
         </ul>
         )
     }
@@ -168,22 +82,6 @@ export default class RecipeComp extends React.Component<IProps, IState> {
     // States can be changed so a subclass doesn't work well
     // Using some external util style class involves passing way too much data (or making too much public)
     // Need to find the right pattern for this
-    renderHeading(): JSX.Element {
-      let text: string;
-      switch(this.state.metaState) {
-        case MetaState.default:
-          text = this.props.data.name;
-          break;
-        case MetaState.editing:
-          text = `(Editing) ${this.props.data.name}`;
-          break;
-        case MetaState.creating:
-          text = "Add new recipe";
-          break;
-      }
-      return <h5 className="card-title" onClick={this.toggleExpanded}>{text}</h5>
-    }
-
     renderBody(): JSX.Element {
       switch(this.state.metaState) {
         case MetaState.default:
@@ -196,7 +94,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
         default:
           return (
             <>
-              <input className="form-control" type="text" placeholder="New recipe name" defaultValue={this.state.name} onChange={this.onNameUpdate} />
+              <input className="form-control" type="text" placeholder="New recipe name" defaultValue={this.state.data.name} onChange={this.onNameUpdate} />
               <p>Ingredients:</p>
               {this.makeIngredientsList()}
               <div className="input-group mb-3">
@@ -240,20 +138,5 @@ export default class RecipeComp extends React.Component<IProps, IState> {
               <button className="btn btn-primary" onClick={this.onAddClick}>Add</button>
           </div>);
       }
-    }
-
-    render() {
-      return (
-      <div className="card my-1">
-        <div className="card-body p-2">
-          {this.renderHeading()}
-          <Collapse in={this.state.expanded}>
-            <div id={this.props.data._id}>
-              {this.renderBody()}
-              {this.renderCRUDbuttons()}
-            </div>
-          </Collapse>
-        </div>
-      </div>);
     }
   }

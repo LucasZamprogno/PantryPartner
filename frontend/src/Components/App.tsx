@@ -9,7 +9,8 @@ export interface ComHub {
     "ingredient-add": (ingredient: Ingredient) => void,
     "ingredient-remove": (id: string) => void,
     "recipe-add": (recipe: Recipe) => void,
-    "recipe-remove": (id: string) => void
+    "recipe-remove": (id: string) => void,
+    "get-ingredients": () => Ingredient[]
 }
 
 export interface IProps {
@@ -33,7 +34,8 @@ export default class App extends React.Component<IProps, IState> {
           "ingredient-add": this.onIngredientAdd,
           "ingredient-remove": this.onIngredientRemove,
           "recipe-add": this.onRecipeAdd,
-          "recipe-remove": this.onRecipeRemove
+          "recipe-remove": this.onRecipeRemove,
+          "get-ingredients": this.getCurrentIngredients
       }
     }
 
@@ -72,6 +74,10 @@ export default class App extends React.Component<IProps, IState> {
             return {recipes: state.recipes.concat(newElem)};
         });
     };
+
+    getCurrentIngredients = (): Ingredient[] => {
+      return JSON.parse(JSON.stringify(this.state.ingredients)); // Copy to prevent modification
+  };
 
     render() {
         return (

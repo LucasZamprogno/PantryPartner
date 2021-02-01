@@ -1,6 +1,6 @@
 import {IRouter} from "./IRouter"
 import {Request, Response} from "express";
-import {Recipe, RecipePreWrite} from "../../../common/types";
+import {Recipe, RecipePreWrite, RecipeStored} from "../../../common/types";
 import {ObjectId} from 'mongodb';
 import {RecipeDatabaseController} from "../Controllers/RecipeDatabaseController";
 import {IngredientDatabaseController} from "../Controllers/IngredientDatabaseController";
@@ -74,7 +74,7 @@ export default class RecipeRouter implements IRouter {
         
         app.patch('/recipe', async (req: Request, res: Response) => {
             console.log("Hit PATCH /recipe");
-            const body: Recipe = req.body;
+            const body: RecipeStored = req.body;
             let doc = await this.recipeDB.getById(req.body._id);
             if (doc) {
                 await this.recipeDB.replace(body);
