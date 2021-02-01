@@ -36,8 +36,8 @@ export abstract class DatabaseController<T> {
         return this.db!.collection(this.col).find().toArray();
     }
 
-    public async replace(id: ObjectId, toUpdate: any): Promise<UpdateWriteOpResult> {
-        return this.db!.collection(this.col).updateOne({"_id": id}, {$set: toUpdate});
+    public async replace(id: string, toUpdate: any): Promise<UpdateWriteOpResult> {
+        return this.db!.collection(this.col).updateOne({"_id": new ObjectId(id)}, {$set: toUpdate});
     }
 
     public async remove(query: any): Promise<DeleteWriteOpResultObject> {
