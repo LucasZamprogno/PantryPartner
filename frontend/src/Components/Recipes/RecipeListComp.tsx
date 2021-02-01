@@ -1,8 +1,8 @@
 import * as React from 'react';
 import RecipeComp from './RecipeComp';
-import {Recipe} from '../../../../common/types'
+import {Recipe, RecipeJoined} from '../../../../common/types'
 import FilterableListComp, {IProps} from '../FilterableListComp';
-import RecipeAddComp from './RecipeAddComp';
+import {MetaState} from './RecipeComp';
 
 export default class RecipeListComp extends FilterableListComp<Recipe> {
 
@@ -11,7 +11,7 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
     }
 
     makeComponent(recipe: Recipe): JSX.Element {
-      return <RecipeComp onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
+      return <RecipeComp initialState={MetaState.default} onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
     }
 
     filterCondition(recipe: Recipe): boolean {
@@ -19,13 +19,18 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
     }
 
     render() {
+      const recipe: RecipeJoined = {
+        _id: "",
+        name: "",
+        ingredient_ids: [],
+        ingredients: []
+      }
       return (
-        <div>
+        <>
           {this.renderList()}
-          <div className="row">
-            <RecipeAddComp options={this.props.altElements!} callback={this.props.comHub['recipe-add']}/>
-          </div>
-        </div>
+          <RecipeComp initialState={MetaState.creating} onDelete={this.props.comHub['recipe-remove']} key={recipe._id} data={recipe}  options={this.props.altElements!} onAdd={this.props.comHub['recipe-add']} onUpdate={()=>{}}/>
+        </>
       )
     }
   }
+  //<RecipeAddComp options={this.props.altElements!} callback={this.props.comHub['recipe-add']}/>

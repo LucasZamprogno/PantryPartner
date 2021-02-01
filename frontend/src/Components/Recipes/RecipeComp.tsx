@@ -3,7 +3,7 @@ import {Ingredient, Recipe, RecipeJoined, RecipePreWrite} from '../../../../comm
 import $ from 'jquery';
 import Collapse from "react-bootstrap/Collapse";
 
-enum MetaState {
+export enum MetaState {
   default,
   editing,
   creating
@@ -12,6 +12,7 @@ enum MetaState {
 interface IProps {
     data: Recipe,
     options: Ingredient[],
+    initialState: MetaState,
     onDelete: (id: string) => void,
     onAdd: (recipe: Recipe) => void,
     onUpdate: (recipe: Recipe) => void,
@@ -28,7 +29,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
       super(props);
       const ingCopy = JSON.parse(JSON.stringify(this.props.data));
       ingCopy.expanded = false;
-      ingCopy.metaState = MetaState.default;
+      ingCopy.metaState = props.initialState;
       this.state = ingCopy;
     }
 
@@ -177,7 +178,7 @@ export default class RecipeComp extends React.Component<IProps, IState> {
           text = `(Editing) ${this.props.data.name}`;
           break;
         case MetaState.creating:
-          text = "Adding new recipe";
+          text = "Add new recipe";
           break;
       }
       return <h5 className="card-title" onClick={this.toggleExpanded}>{text}</h5>
