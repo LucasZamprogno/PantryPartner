@@ -4,10 +4,12 @@ import { Ingredient, Recipe } from '../../../common/types';
 import IngredientListComp from './Ingredients/IngredientListComp';
 import NavbarComp from './NavbarComp';
 import RecipeListComp from './Recipes/RecipeListComp';
+import ShoppingListComp from './Ingredients/ShoppingListComp';
 
 export interface ComHub {
     "ingredient-add": (ingredient: Ingredient) => void,
     "ingredient-remove": (id: string) => void,
+    "ingredient-update": (ingredient: Ingredient) => void,
     "recipe-add": (recipe: Recipe) => void,
     "recipe-remove": (id: string) => void,
     "get-ingredients": () => Ingredient[]
@@ -33,6 +35,7 @@ export default class App extends React.Component<IProps, IState> {
       this.comHub = {
           "ingredient-add": this.onIngredientAdd,
           "ingredient-remove": this.onIngredientRemove,
+          "ingredient-update": this.onIngredientUpdate,
           "recipe-add": this.onRecipeAdd,
           "recipe-remove": this.onRecipeRemove,
           "get-ingredients": this.getCurrentIngredients
@@ -62,6 +65,18 @@ export default class App extends React.Component<IProps, IState> {
       });
     };
 
+    onIngredientUpdate = (updatedElem: Ingredient): void => {
+      this.setState((state: IState, props: IProps) => {
+        const copy = JSON.parse(JSON.stringify(state.ingredients));
+        for (const index in copy) {
+          if (copy[index].name === updatedElem.name) {
+            copy[index] = updatedElem;
+          }
+        }
+        return {ingredients: copy};
+      });
+    };
+
     onRecipeRemove = (id: string): void => {
         this.setState((state: IState, props: IProps) => {
             return {recipes: state.recipes.filter(x => x._id != id)}
@@ -77,7 +92,23 @@ export default class App extends React.Component<IProps, IState> {
 
     getCurrentIngredients = (): Ingredient[] => {
       return JSON.parse(JSON.stringify(this.state.ingredients)); // Copy to prevent modification
-  };
+    };
+
+    public getShoppingList(): Ingredient[] {
+        const notStocked: Ingredient[] = this.state.ingredients.filter(x => x.isStocked === false);
+        notStocked.sort(this.shoppingSortCompareFn);
+        return notStocked;
+    }
+
+    private shoppingSortCompareFn(a: Ingredient, b: Ingredient) {
+        if (a.isStaple && !b.isStaple) {
+            return -1;
+        } else if (b.isStaple && !a.isStaple) {
+            return 1;
+        } else {
+            return a.name < b.name ? -1 : 1;
+        }
+    }
 
     render() {
         return (
@@ -88,6 +119,9 @@ export default class App extends React.Component<IProps, IState> {
             </div>
             <div className="row justify-content-center d-none" id="recipes">
                 <div className="col-10"><RecipeListComp elements={this.state.recipes} altElements={this.state.ingredients} comHub={this.comHub} /></div>
+            </div>
+            <div className="row justify-content-center d-none" id="shopping">
+                <div className="col-10"><ShoppingListComp elements={this.getShoppingList()} comHub={this.comHub} /></div>
             </div>
             </>
         )
