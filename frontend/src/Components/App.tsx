@@ -5,6 +5,7 @@ import IngredientListComp from './Ingredients/IngredientListComp';
 import NavbarComp from './NavbarComp';
 import RecipeListComp from './Recipes/RecipeListComp';
 import ShoppingListComp from './Ingredients/ShoppingListComp';
+import SuggestedRecipeComp from './Ingredients/SuggestedRecipeComp';
 
 export interface ComHub {
     "ingredient-add": (ingredient: Ingredient) => void,
@@ -100,10 +101,28 @@ export default class App extends React.Component<IProps, IState> {
         return notStocked;
     }
 
+    public getRecipeSuggestList(): Recipe[] {
+        const copy: Recipe[] = JSON.parse(JSON.stringify(this.state.recipes));
+        return copy.sort(this.recipeSuggesterSortCompareFn);
+    }
+
     private shoppingSortCompareFn(a: Ingredient, b: Ingredient) {
         if (a.isStaple && !b.isStaple) {
             return -1;
         } else if (b.isStaple && !a.isStaple) {
+            return 1;
+        } else {
+            return a.name < b.name ? -1 : 1;
+        }
+    }
+
+    private recipeSuggesterSortCompareFn(a: Recipe, b: Recipe) {
+        const numIngredientsUnstocked = (recipe: Recipe) => {return recipe.ingredients.filter(x => !x.isStocked).length;};
+        const numUnstockedA = numIngredientsUnstocked(a);
+        const numUnstockedB = numIngredientsUnstocked(b);
+        if (numUnstockedA < numUnstockedB) {
+            return -1;
+        } else if (numUnstockedB < numUnstockedA) {
             return 1;
         } else {
             return a.name < b.name ? -1 : 1;
@@ -122,6 +141,9 @@ export default class App extends React.Component<IProps, IState> {
             </div>
             <div className="row justify-content-center d-none" id="shopping">
                 <div className="col-10"><ShoppingListComp elements={this.getShoppingList()} comHub={this.comHub} /></div>
+            </div>
+            <div className="row justify-content-center d-none" id="suggester">
+                <div className="col-10"><SuggestedRecipeComp elements={this.getRecipeSuggestList()} comHub={this.comHub} /></div>
             </div>
             </>
         )

@@ -27,7 +27,7 @@ export default class NavbarComp extends React.Component {
               <a className="nav-link" onClick={() => this.toggleVisible("shopping")}>Shopping List</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Recipe Suggester</a>
+              <a className="nav-link" onClick={() => this.toggleVisible("suggester")}>Recipe Suggester</a>
             </li>
           </ul>
         </div>
