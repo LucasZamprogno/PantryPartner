@@ -16,73 +16,92 @@ export default class RecipeRouter implements IRouter {
         this.ingredientDB.initDb();
     }
 
-    public addRoutes(app: any) {
-        app.get('/ingredient/:id', async (req: Request, res: Response) => {
-            console.log("Hit GET /ingredient/:id");
-            const doc = await this.ingredientDB.getById(req.params.id);
-            if (doc) {
-                res.status(200);
-                res.json(doc);
-            } else {
-                res.sendStatus(404);
-        }
-        });
-        
+    public addRoutes(app: any) {        
         app.get('/recipe/:id', async (req: Request, res: Response) => {
             console.log("Hit GET /recipe/:id");
-            const doc = await this.recipeDB.getById(req.params.id);
-            if (doc) {
-                res.status(200);
-                res.json(doc);
-            } else {
-                res.sendStatus(404);
+            try {
+                const doc = await this.recipeDB.getById(req.params.id);
+                if (doc) {
+                    res.status(200);
+                    res.json(doc);
+                } else {
+                    res.sendStatus(404);
+                }
+            } catch (e) {
+              console.log(`Error thrown: ${e}`);
+              res.status(500);
+              res.json({error: "Internal error getting recipe"});
             }
         });
         
         app.get('/recipes', async (req: Request, res: Response) => {
-            console.log("Hit GET /recipes");
-            const all = await this.recipeDB.readRecipesInFull();
-            res.json(all);
+            try {
+                console.log("Hit GET /recipes");
+                const all = await this.recipeDB.readRecipesInFull();
+                res.json(all);
+            } catch (e) {
+              console.log(`Error thrown: ${e}`);
+              res.status(500);
+              res.json({error: "Internal error getting recipes"});
+            }
         });
         
         app.delete('/recipe/:id', async (req: Request, res: Response) => {
             console.log("Hit DELETE /recipe/:id");
-            const id: ObjectId = new ObjectId(req.params.id);
-            const doc = await this.recipeDB.getById(req.params.id);
-            if (doc) {
-                await this.recipeDB.remove({_id:id});
-                res.status(200);
-                res.json(doc);
-            } else {
-                res.sendStatus(404);
+            try {
+                const id: ObjectId = new ObjectId(req.params.id);
+                const doc = await this.recipeDB.getById(req.params.id);
+                if (doc) {
+                    await this.recipeDB.remove({_id:id});
+                    res.status(200);
+                    res.json(doc);
+                } else {
+                    res.sendStatus(404);
+                }
+            } catch (e) {
+              console.log(`Error thrown: ${e}`);
+              res.status(500);
+              res.json({error: "Internal error deleting recipe"});
             }
         });
         
         app.put('/recipe', async (req: Request, res: Response) => {
             console.log("Hit PUT /recipe");
-            const body: RecipePreWrite = req.body;
-            let doc = await this.recipeDB.getByName(body.name);
-            if (doc) {
-                res.sendStatus(400);
-            } else {
-                await this.recipeDB.write(body);
-                doc = await this.recipeDB.getByName(body.name);
-                res.status(200);
-                res.json(doc);
+            try {
+                const body: RecipePreWrite = req.body;
+                let doc = await this.recipeDB.getByName(body.name);
+                if (doc) {
+                    res.sendStatus(400);
+                } else {
+                    await this.recipeDB.write(body);
+                    doc = await this.recipeDB.getByName(body.name);
+                    res.status(200);
+                    res.json(doc);
+                }
+            } catch (e) {
+              console.log(`Error thrown: ${e}`);
+              res.status(500);
+              res.json({error: "Internal error adding recipe"});
             }
         });
         
         app.patch('/recipe', async (req: Request, res: Response) => {
             console.log("Hit PATCH /recipe");
-            const body: RecipeStored = req.body;
-            let doc = await this.recipeDB.getById(req.body._id);
-            if (doc) {
-                await this.recipeDB.replace(body);
-                doc = await this.recipeDB.getById(body._id);
-                res.status(200);
-                res.json(doc);
-            } else {
-                res.sendStatus(400);
+            try {
+                const body: RecipeStored = req.body;
+                let doc = await this.recipeDB.getById(req.body._id);
+                if (doc) {
+                    await this.recipeDB.replace(body);
+                    doc = await this.recipeDB.getById(body._id);
+                    res.status(200);
+                    res.json(doc);
+                } else {
+                    res.sendStatus(400);
+                }
+            } catch (e) {
+              console.log(`Error thrown: ${e}`);
+              res.status(500);
+              res.json({error: "Internal error updating recipe"});
             }
         });
     }

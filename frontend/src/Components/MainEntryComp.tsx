@@ -2,6 +2,7 @@ import * as React from 'react';
 import $ from 'jquery';
 import Collapse from "react-bootstrap/Collapse";
 import { Ingredient, MongoEntry } from '../../../common/types';
+import e from 'express';
 
 export enum MetaState {
   default,
@@ -78,11 +79,15 @@ export default abstract class MainEntryComp<T extends MongoEntry> extends React.
             type: 'PUT',
             data: this.getDataPreWriteString(),
             success: (result) => {
-                this.props.onAdd(result);
+              this.props.onAdd(result);
             },
-            error:(err) => {
-                // TODO add proper error handling
-                console.log(err); // And maybe a logging framework
+            error:(err: any) => {
+              const msg = err?.responseJSON?.error;
+              if(msg) {
+                alert(msg);
+              } else {
+                alert(`Connection to server failed`);
+              }
             },
         });
     }
@@ -92,11 +97,15 @@ export default abstract class MainEntryComp<T extends MongoEntry> extends React.
           url: `/${this.endpoint}/${this.props.data._id}`,
           type: 'DELETE',
           success: (result) => {
-              this.props.onDelete(result._id);
+            this.props.onDelete(result._id);
           },
           error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
+            const msg = err?.responseJSON?.error;
+            if(msg) {
+              alert(msg);
+            } else {
+              alert(`Connection to server failed`);
+            }
           },
       });
     }
@@ -108,13 +117,17 @@ export default abstract class MainEntryComp<T extends MongoEntry> extends React.
           url: `/${this.endpoint}`,
           type: 'PATCH',
           data: JSON.stringify(this.state.data),
-          success: (result: T) => {
+          success: (result: any) => { // Ideally this would be T | {error: string} but it doesn't play nice
             this.setState({data: result});
             this.setState({metaState: MetaState.default});
           },
-          error:(err) => {
-              // TODO add proper error handling
-              console.log(err); // And maybe a logging framework
+          error:(err: any) => {
+            const msg = err?.responseJSON?.error;
+            if(msg) {
+              alert(msg);
+            } else {
+              alert(`Connection to server failed`);
+            }
           },
       });
     }

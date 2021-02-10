@@ -51,6 +51,12 @@ export default class App extends React.Component<IProps, IState> {
                 ingredients: res[0],
                 recipes: res[1]
             })
+        }).catch((err: any) => {
+            let str = "Error while fetching data on startup";
+            if (err["error"]) {
+                str += `: ${err["error"]}`;
+            }
+            alert(str);
         })
     }
 
