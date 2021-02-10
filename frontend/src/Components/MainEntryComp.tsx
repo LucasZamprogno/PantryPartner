@@ -2,7 +2,6 @@ import * as React from 'react';
 import $ from 'jquery';
 import Collapse from "react-bootstrap/Collapse";
 import { Ingredient, MongoEntry } from '../../../common/types';
-import e from 'express';
 
 export enum MetaState {
   default,

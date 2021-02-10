@@ -1,4 +1,5 @@
 import * as React from 'react';
+import $ from 'jquery';
 import {Ingredient, IngredientPreWrite} from '../../../../common/types'
 import MainEntryComp, { EntryProps, MetaState } from '../MainEntryComp';
 
@@ -9,6 +10,34 @@ export default class IngredientComp extends MainEntryComp<Ingredient> {
 
     constructor(props: EntryProps<Ingredient>) {
       super(props);
+    }
+
+    onDeleteClick = (event: any): void => {
+      $.ajax({
+          url: `/${this.endpoint}/safe/${this.props.data._id}`,
+          type: 'DELETE',
+          success: (result) => {
+            this.props.onDelete(result._id);
+          },
+          error:(err) => {
+            const status = err.status;
+            if (status === 400) {
+              const usedIn = err?.responseJSON?.usedIn;
+              let str = "This ingredient is still in used in the following recipes:";
+              for (const recipe of usedIn) {
+                str += `\n- ${recipe}`;
+              }
+              alert(str);
+            } else {
+              const msg = err?.responseJSON?.error;
+              if(msg) {
+                alert(msg);
+              } else {
+                alert(`Connection to server failed`);
+              }
+            }
+          },
+      });
     }
 
     getDataPreWriteString(): string {

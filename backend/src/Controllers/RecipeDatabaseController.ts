@@ -41,4 +41,8 @@ export class RecipeDatabaseController extends DatabaseController<Recipe> {
     public async getByFilter(filter: any) {
         return (await this.readRecipesInFull(filter))[0];
     }
+
+    public async getRecipcesThatUseIngredient(id: ObjectId) {
+        return await this.db?.collection(this.col).find({ingredient_ids: id}).toArray();
+    }
 }

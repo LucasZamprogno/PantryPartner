@@ -3,13 +3,36 @@ import {Request, Response} from "express";
 import {Ingredient, IngredientPreWrite} from "../../../common/types";
 import {ObjectId} from 'mongodb';
 import {IngredientDatabaseController} from "../Controllers/IngredientDatabaseController";
+import { RecipeDatabaseController } from "../Controllers/RecipeDatabaseController";
 
 export default class IngredientRouter implements IRouter {
+    private recipeDB: RecipeDatabaseController;
     private ingredientDB: IngredientDatabaseController;
 
     constructor() {
         this.ingredientDB = new IngredientDatabaseController();
         this.ingredientDB.initDb();
+        this.recipeDB = new RecipeDatabaseController();
+        this.recipeDB.initDb();
+    }
+
+    private async doDelete(id_string: string, res: Response) {
+      try {
+        const id: ObjectId = new ObjectId(id_string);
+        const doc = await this.ingredientDB.getById(id_string);
+        if (doc) {
+          await this.ingredientDB.remove({_id:id});
+          res.status(200);
+          res.json(doc);
+        } else {
+          res.sendStatus(404);
+        }
+      } catch (e) {
+        console.log(`Error thrown: ${e}`);
+        res.status(500);
+        res.json({error: "Internal error deleting ingredient"});
+      }
+
     }
 
     public addRoutes(app: any) {
@@ -27,22 +50,7 @@ export default class IngredientRouter implements IRouter {
         
         app.delete('/ingredient/:id', async (req: Request, res: Response) => {
           console.log("Hit DELETE /ingredient/:id");
-          try {
-            const id: ObjectId = new ObjectId(req.params.id);
-            const doc = await this.ingredientDB.getById(req.params.id);
-            if (doc) {
-              throw "aaaaa";
-              await this.ingredientDB.remove({_id:id});
-              res.status(200);
-              res.json(doc);
-            } else {
-              res.sendStatus(404);
-            }
-          } catch (e) {
-            console.log(`Error thrown: ${e}`);
-            res.status(500);
-            res.json({error: "Internal error deleting ingredient"});
-          }
+          await this.doDelete(req.params.id, res);
         });
         
         app.put('/ingredient', async (req: Request, res: Response) => {
@@ -82,6 +90,18 @@ export default class IngredientRouter implements IRouter {
             console.log(`Error thrown: ${e}`);
             res.status(500);
             res.json({error: "Internal error updating ingredient"});
+          }
+        });
+
+        app.delete('/ingredient/safe/:id', async (req: Request, res: Response) => {
+          console.log("Hit DELETE /ingredient/safe/:id");
+          const id = new ObjectId(req.params.id);
+          const usedIn = await this.recipeDB.getRecipcesThatUseIngredient(id);
+          if (typeof usedIn !== 'undefined' && usedIn.length > 0) {
+            res.status(400);
+            res.json({usedIn: usedIn.map(x => x.name)});
+          } else {
+            await this.doDelete(req.params.id, res);
           }
         });
     }
