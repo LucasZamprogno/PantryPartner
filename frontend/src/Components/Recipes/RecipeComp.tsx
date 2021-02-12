@@ -62,10 +62,12 @@ export default class RecipeComp extends MainEntryComp<Recipe> {
     }
 
     makeOptionList(): JSX.Element {
-        const options = this.props.getIngredients!().map(x => (<option value={x.name}/>))
+        let ingredient_names = this.props.getIngredients!().map(x => x.name);
+        let currently_used_names = this.state.data.ingredients.map(x => x.name);
+        let options = ingredient_names.filter(x => !currently_used_names.includes(x));
         return (
             <datalist id="suggestions">
-                {options}
+                {options.map(x => (<option value={x}/>))}
             </datalist>
         )
     }
