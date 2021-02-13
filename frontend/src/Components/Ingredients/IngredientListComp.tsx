@@ -5,6 +5,9 @@ import { MetaState } from '../MainEntryComp';
 import IngredientComp from './IngredientComp';
 
 export default class IngredientListComp extends FilterableListComp<Ingredient> {
+    
+  protected readonly orderOptions: string[] = ["Name", "Created"];
+  protected readonly componentName: string = "IngredientList";
 
     constructor(props: IProps<Ingredient>) {
       super(props);
@@ -21,6 +24,14 @@ export default class IngredientListComp extends FilterableListComp<Ingredient> {
 
     filterCondition(ingredient: Ingredient): boolean {
       return ingredient.name.toLowerCase().includes(this.state.filterText.toLowerCase());
+    }
+
+    getSortedList(list: Ingredient[]): Ingredient[] {
+      if (this.state.sortOrder === "Name") {
+        return list.sort((a, b) => a.name < b.name ? -1 : 1);
+      } else {
+        return list;
+      }
     }
 
     render() {

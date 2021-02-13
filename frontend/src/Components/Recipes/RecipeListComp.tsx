@@ -2,9 +2,12 @@ import * as React from 'react';
 import {Recipe} from '../../../../common/types'
 import FilterableListComp, {IProps} from '../FilterableListComp';
 import RecipeComp from './RecipeComp';
-import {MetaState} from '../MainEntryComp'
+import {MetaState} from '../MainEntryComp';
 
 export default class RecipeListComp extends FilterableListComp<Recipe> {
+    
+  protected readonly orderOptions: string[] = ["Name", "Created"];
+  protected readonly componentName: string = "RecipeList";
 
     constructor(props: IProps<Recipe>) {
       super(props);
@@ -22,6 +25,14 @@ export default class RecipeListComp extends FilterableListComp<Recipe> {
 
     filterCondition(recipe: Recipe): boolean {
       return recipe.name.toLowerCase().includes(this.state.filterText.toLowerCase());
+    }
+
+    getSortedList(list: Recipe[]): Recipe[] {
+      if (this.state.sortOrder === "Name") {
+        return list.sort((a, b) => a.name < b.name ? -1 : 1);
+      } else {
+        return list;
+      }
     }
 
     render() {
