@@ -8,3 +8,5 @@ Really though, this was a basis to learn new tech. I had interacted with MongoDB
 Honestly the data here is more suited to a relational database but this is what I wanted to learn.
 I also was looking to learn React due to its popularity (which I now understand, very cool).
 Then as a meta goal, I just wanted to go through the "fun" of doing initial setup and configuration of TypeScript, Express, MongoDB, Webpack, React, and Bootstrap all getting them to all play together.
+
+![PantryPartner](./PantryPartner.png?raw=true)
